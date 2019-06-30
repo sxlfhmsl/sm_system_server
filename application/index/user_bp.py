@@ -13,3 +13,7 @@ class UserLoginView(BaseView):
     用户登录
     """
     pass
+
+
+user_bp.add_url_rule('/login', methods=['GET'], view_func=UserLoginView.as_view('user_login'))
+

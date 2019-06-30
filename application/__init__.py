@@ -6,6 +6,7 @@ from flask import Flask
 from flask_wtf import CSRFProtect
 from flask_migrate import Migrate
 import pymysql
+
 from .dao.utils import db, flask_redis
 
 pymysql.install_as_MySQLdb()
@@ -38,6 +39,9 @@ def create_app(test_config=None):
     # 启用日志
     setup_log(test_config)
 
+    # 添加蓝图
+    reg_blueprint(app)
+
     # a simple page that says hello
     @app.route('/hello')
     def hello():
@@ -57,3 +61,16 @@ def setup_log(config):
     file_log_handler.setFormatter(formatter)
     # 为全局的日志工具对象（flask app使用的）添加日志记录器
     logging.getLogger().addHandler(file_log_handler)
+
+
+def reg_blueprint(app):
+    """
+    添加蓝图函数
+    :return: None
+    """
+    from .index.user_bp import user_bp
+    from .index.exception_bp import exception_bp
+
+    app.register_blueprint(user_bp, url_prefix='/user')
+    app.register_blueprint(exception_bp, url_prefix='/exception')
+

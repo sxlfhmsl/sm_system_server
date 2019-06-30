@@ -3,6 +3,7 @@
 定义一些基础东西
 """
 from flask.views import View
+from flask import abort
 
 
 class BaseView(View):
@@ -11,5 +12,6 @@ class BaseView(View):
     """
 
     def dispatch_request(self):
-        pass
+        # 暂时404
+        abort(404)
 
