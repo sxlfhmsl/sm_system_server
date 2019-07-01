@@ -1,6 +1,9 @@
 pip freeze > requirements.txt		生成requirements
 pip install -r requirements.txt		安装requirements.txt依赖
 
+# 数据库模型地址
+Navicat\Premium\profiles
+
 1. 初始化数据迁移的目录
 -m flask db init
 ​
