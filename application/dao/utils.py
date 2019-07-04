@@ -107,8 +107,6 @@ class RedisOp:
         return pub
 
 
-# 数据库连接
-db = SQLAlchemy()
 # redis
 redis_op = RedisOp()
 flask_redis = FlaskRedis()

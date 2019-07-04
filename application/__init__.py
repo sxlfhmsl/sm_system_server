@@ -7,7 +7,8 @@ from flask_wtf import CSRFProtect
 from flask_migrate import Migrate
 import pymysql
 
-from .dao.utils import db, flask_redis
+from .dao.utils import flask_redis
+from .dao.models import db
 
 pymysql.install_as_MySQLdb()
 

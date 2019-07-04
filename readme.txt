@@ -15,3 +15,6 @@ Navicat\Premium\profiles
 ​
 4. 降级版本[删除表]
 -m flask db  downgrade
+
+5.生成Model
+flask-sqlacodegen mysql+pymysql://root:admin123@127.0.0.1:3306/sm_system  --outfile application/dao/models.py --flask
