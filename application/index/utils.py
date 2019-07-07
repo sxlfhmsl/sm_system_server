@@ -15,6 +15,7 @@ def check_auth(fn):
     def wrapper(*args, **kwargs):
         auth = request.headers.get('auth', None)
         token = RedisOp().get_normal(auth)
+        print(auth)
         # 检测不到token
         if token is None:
             abort(404)
@@ -35,4 +36,34 @@ class BaseView(View):
     def dispatch_request(self):
         # 暂时404
         abort(404)
+
+
+class PermissionView(BaseView):
+    # 验证token
+    decorators = (check_auth, )
+
+    def __init__(self):
+        self._token_data = None
+        self._uid = None
+        self._u_type = None
+
+    def response_admin(self):
+        raise NotImplementedError
+
+    def response_agent(self):
+        raise NotImplementedError
+
+    def response_member(self):
+        raise NotImplementedError
+
+    def dispatch_request(self, token_dict: dict):
+        self._token_data = token_dict['data']
+        self._uid = self._token_data['uid']
+        self._u_type = self._token_data['utype']
+        if self._u_type == 1:
+            return self.response_admin()
+        elif self._u_type == 2:
+            return self.response_agent()
+        elif self._u_type == 3:
+            return self.response_member()
 

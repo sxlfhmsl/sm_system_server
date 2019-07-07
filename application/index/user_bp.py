@@ -5,7 +5,7 @@
 from flask.blueprints import Blueprint
 from flask import request, jsonify
 
-from .utils import BaseView
+from .utils import BaseView, PermissionView
 from .sta_code import SUCCESS, ERROR_USER_PASSWORD_ERROR
 from ..service.user_service import SmUserService
 
@@ -27,5 +27,27 @@ class UserLoginView(BaseView):
             return jsonify(ERROR_USER_PASSWORD_ERROR)
 
 
+class UserInfoView(PermissionView):
+    """
+    获取用户信息
+    """
+
+    def response_admin(self):
+        success = SUCCESS()
+        success['data'] = SmUserService.admin_info_id(self._uid)
+        return jsonify(success)
+
+    def response_agent(self):
+        success = SUCCESS()
+        success['data'] = SmUserService.agent_info_id(self._uid)
+        return jsonify(success)
+
+    def response_member(self):
+        success = SUCCESS()
+        success['data'] = SmUserService.member_info_id(self._uid)
+        return jsonify(success)
+
+
 user_bp.add_url_rule('/login', methods=['POST'], view_func=UserLoginView.as_view('user_login'))
+user_bp.add_url_rule('/info', methods=['POST'], view_func=UserInfoView.as_view('user_info'))
 

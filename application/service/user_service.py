@@ -8,7 +8,7 @@ from sqlalchemy import and_
 from hashlib import sha256
 
 from .auth import encode_auth_token
-from ..dao.models import db, SmUser, SmUserLog
+from ..dao.models import db, SmUser, SmUserLog, SmUserAdmin, SmUserAgent, SmUserMember
 from ..dao.utils import RedisOp
 
 
@@ -49,4 +49,32 @@ class SmUserService:
             current_app.logger.error(e)
             return None
 
+    @classmethod
+    def admin_info_id(cls, uid):
+        """
+        通过uid获取admin用户信息
+        :param uid: 用户id
+        :return:
+        """
+        result = SmUserAdmin.query.filter(SmUser.ID == uid).first()
+        result_dict = result.to_dict()
+        return {}
+
+    @classmethod
+    def agent_info_id(cls, uid):
+        """
+        通过uid获取agent用户信息
+        :param uid: 用户id
+        :return:
+        """
+        pass
+
+    @classmethod
+    def member_info_id(cls, uid):
+        """
+        通过uid获取member用户信息
+        :param uid: 用户id
+        :return:
+        """
+        pass
 
