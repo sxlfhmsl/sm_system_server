@@ -30,7 +30,7 @@ def create_app(test_config=None):
         pass
 
     # 开启CSRF防范功能
-    CSRFProtect(app)
+    # CSRFProtect(app)
 
     # 配置数据库
     db.init_app(app)
@@ -72,6 +72,8 @@ def reg_blueprint(app):
     from .index.user_bp import user_bp
     from .index.exception_bp import exception_bp
 
+    # 用户相关蓝图接口
     app.register_blueprint(user_bp, url_prefix='/user')
+    # 异常拦截
     app.register_blueprint(exception_bp, url_prefix='/exception')
 

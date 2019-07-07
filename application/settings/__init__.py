@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from hashlib import sha256
 
 
 class FlaskConfig:
@@ -18,7 +19,11 @@ class FlaskConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # 查询时会显示原始SQL语句
     SQLALCHEMY_ECHO = False
+    # 客户端盐值
+    SECRET_KEY = sha256("zxcvbnm123.".encode('utf8')).hexdigest()
+    # 剩余时间
+    JWT_LIFETIME = 3600
 
-    # redis
-    REDIS_URL = "redis://admin123@localhost:6379/0"
+    # redis redis://[:password]@localhost:6379/0
+    REDIS_URL = "redis://:admin123@localhost:6379/0"
 
