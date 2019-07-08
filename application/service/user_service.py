@@ -8,6 +8,7 @@ from sqlalchemy import and_
 from hashlib import sha256
 
 from .auth import encode_auth_token
+from .model_convert import sig_model_to_dict
 from ..dao.models import db, SmUser, SmUserLog, SmUserAdmin, SmUserAgent, SmUserMember
 from ..dao.utils import RedisOp
 
@@ -56,9 +57,11 @@ class SmUserService:
         :param uid: 用户id
         :return:
         """
-        result = SmUserAdmin.query.filter(SmUser.ID == uid).first()
-        result_dict = result.to_dict()
-        return {}
+        result = SmUserAdmin.query.filter().first()
+        result = sig_model_to_dict(result, *SmUserAdmin.__table__.columns, *SmUser.__table__.columns)
+        result.pop('Forbidden')
+        result.pop('Password')
+        return result
 
     @classmethod
     def agent_info_id(cls, uid):
@@ -67,7 +70,11 @@ class SmUserService:
         :param uid: 用户id
         :return:
         """
-        pass
+        result = SmUserAgent.query.filter().first()
+        result = sig_model_to_dict(result, *SmUserAgent.__table__.columns, *SmUser.__table__.columns)
+        result.pop('Forbidden')
+        result.pop('Password')
+        return result
 
     @classmethod
     def member_info_id(cls, uid):
@@ -76,5 +83,9 @@ class SmUserService:
         :param uid: 用户id
         :return:
         """
-        pass
+        result = SmUserMember.query.filter().first()
+        result = sig_model_to_dict(result, *SmUserMember.__table__.columns, *SmUser.__table__.columns)
+        result.pop('Forbidden')
+        result.pop('Password')
+        return result
 
