@@ -23,6 +23,8 @@ class FlaskConfig:
     SECRET_KEY = sha256("zxcvbnm123.".encode('utf8')).hexdigest()
     # 剩余时间
     JWT_LIFETIME = 3600
+    # 其他配置项
+    SQLALCHEMY_ENGINE_OPTIONS = {}
 
     # redis redis://[:password]@localhost:6379/0
     REDIS_URL = "redis://:admin123@localhost:6379/0"

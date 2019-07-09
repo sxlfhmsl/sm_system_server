@@ -2,6 +2,7 @@
 """
 将model转换为dict或者list
 """
+from collections import Iterable
 from datetime import datetime as cdatetime     # 有时候会返回datatime类型
 from datetime import date, time
 from flask_sqlalchemy import Model
@@ -33,12 +34,38 @@ def query_to_dict(models):
 
 
 # 当结果为result对象列表时，result有key()方法
-def result_to_dict(results):
-    res = [dict(zip(r.keys(), r)) for r in results]
-    # 这里r为一个字典，对象传递直接改变字典属性
-    for r in res:
-        find_datetime(r)
-    return res
+def result_to_dict(result):
+    try:
+        if isinstance(result, Iterable):
+            res = [dict(zip(r.keys(), r)) for r in result]
+            # 这里r为一个字典，对象传递直接改变字典属性
+            for r in res:
+                find_datetime(r)
+        else:
+            res = dict(zip(result.keys(), result))
+            find_datetime(res)
+        return res
+    except BaseException as e:
+        print(e.args)
+        return None
+
+
+def model_to_dict_by_dict(result):
+    # 转换完成后，删除  '_sa_instance_state' 特殊属性
+    try:
+        if isinstance(result, Iterable):
+            tmp = [dict(zip(res.__dict__.keys(), res.__dict__.values())) for res in result]
+            for t in tmp:
+                t.pop('_sa_instance_state')
+                find_datetime(t)
+        else:
+            tmp = dict(zip(result.__dict__.keys(), result.__dict__.values()))
+            tmp.pop('_sa_instance_state')
+            find_datetime(tmp)
+        return tmp
+    except BaseException as e:
+        print(e.args)
+        return None
 
 
 def sig_model_to_dict(model, *columns):
