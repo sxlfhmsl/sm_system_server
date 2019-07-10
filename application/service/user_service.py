@@ -10,7 +10,7 @@ from hashlib import sha256
 
 from .auth import encode_auth_token
 from .model_convert import model_to_dict_by_dict
-from ..dao.models import db, SmUser, SmUserLog, SmUserAdmin, SmUserAgent, SmUserMember
+from ..dao.models import db, SmUser, SmUserLog, SmUserAdmin, SmUserAgent, SmUserMember, SmUserRole
 from ..dao.utils import RedisOp
 
 
@@ -46,8 +46,15 @@ class SmUserService:
                     db.session.commit()
                 return 0                             # 用户名或密码错误
             result.LastLogonTime = date_time_now
+            role = SmUserRole.query.filter(SmUserRole.ID == result.RoleID).first()
             # 创建并插入更新日志
-            log = SmUserLog(UserID=result.ID, Type='管理员', Model='登录', Time=date_time_now, Note='管理员登录')
+            log = SmUserLog(
+                UserID=result.ID,
+                Type=role.Description,
+                Model='登录',
+                Time=date_time_now,
+                Note=role.Description + '登录'
+            )
             db.session.add(log)
             db.session.commit()
             token = encode_auth_token(uid=result.ID, utype=result.RoleID)
