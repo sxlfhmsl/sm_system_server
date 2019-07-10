@@ -4,7 +4,7 @@
 """
 import datetime
 from flask import current_app
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased, outerjoin
 from hashlib import sha256
 
@@ -27,25 +27,34 @@ class SmUserService:
         :param password: 密码
         :return: token
         """
+        password = sha256(password.encode()).hexdigest()
         # 获取当前时间
         date_time_now = datetime.datetime.now()
         try:
-            # 查询记录
-            result = SmUser.query.filter(and_(SmUser.LoginName == login_name, SmUser.Password == password)).first()
-            if result:
-                result.LastLogonTime = date_time_now
-                # 创建并插入更新日志
-                log = SmUserLog(UserID=result.ID, Type='管理员', Model='登录', Time=date_time_now, Note='管理员登录')
-                db.session.add(log)
-                db.session.commit()
-                token = encode_auth_token(uid=result.ID, utype=result.RoleID)
-                token_key = sha256(token.encode()).hexdigest()
-                RedisOp().set_normal(token_key, token, 3600)
-                # 返回验证码，然后据此获取需求
-                return token_key
-            else:
-                current_app.logger.warning("用户" + login_name + "登录失败")
-                return None
+            # 查询账号密码符合的账户
+            result = SmUser.query.filter(SmUser.LoginName == login_name).first()
+            if result is None:
+                return 0                             # 用户名或密码错误
+            if result.ID != 1:
+                if result.Forbidden != 0:
+                    return 1                         # 用户被禁止登录
+                if result.Lock >= 6:
+                    return 2                         # 账户被锁定
+            if result.Password != password:
+                if result.ID != 1:
+                    result.Lock += 1
+                    db.session.commit()
+                return 0                             # 用户名或密码错误
+            result.LastLogonTime = date_time_now
+            # 创建并插入更新日志
+            log = SmUserLog(UserID=result.ID, Type='管理员', Model='登录', Time=date_time_now, Note='管理员登录')
+            db.session.add(log)
+            db.session.commit()
+            token = encode_auth_token(uid=result.ID, utype=result.RoleID)
+            token_key = sha256(token.encode()).hexdigest()
+            RedisOp().set_normal(token_key, token, 3600)
+            # 返回验证码，然后据此获取需求
+            return token_key
         except Exception as e:
             db.session.rollback()
             current_app.logger.error(e)
@@ -58,10 +67,14 @@ class SmUserService:
         :param uid: 用户id
         :return:
         """
-        result = model_to_dict_by_dict(SmUserAdmin.query.filter(
-            and_(SmUserAdmin.ID == uid, SmUserAdmin.Forbidden == 0)).first())
-        result.pop('Password')
-        return result
+        try:
+            result = model_to_dict_by_dict(SmUserAdmin.query.filter(
+                and_(SmUserAdmin.ID == uid, SmUserAdmin.Forbidden == 0)).first())
+            result.pop('Password')
+            return result
+        except Exception as e:
+            current_app.logger.error(e)
+            return None
 
     @classmethod
     def agent_info_id(cls, uid):
@@ -70,10 +83,14 @@ class SmUserService:
         :param uid: 用户id
         :return:
         """
-        result = model_to_dict_by_dict(SmUserAgent.query.filter(
-            and_(SmUserAgent.ID == uid, SmUserAgent.Forbidden == 0, SmUserAgent.Lock == 0)).first())
-        result.pop('Password')
-        return result
+        try:
+            result = model_to_dict_by_dict(SmUserAgent.query.filter(
+                and_(SmUserAgent.ID == uid, SmUserAgent.Forbidden == 0, SmUserAgent.Lock == 0)).first())
+            result.pop('Password')
+            return result
+        except Exception as e:
+            current_app.logger.error(e)
+            return None
 
     @classmethod
     def member_info_id(cls, uid):
@@ -82,11 +99,15 @@ class SmUserService:
         :param uid: 用户id
         :return:
         """
-        mid = SmUserMember.query.filter(
-            and_(SmUserMember.ID == uid, SmUserMember.Forbidden == 0, SmUserMember.Lock == 0)).first()
-        result = model_to_dict_by_dict(mid)
-        result.pop('Password')
-        result['AgentName'] = mid.sm_user_agent.LoginName
-        result['ClerkName'] = mid.sm_user_agent.NickName
-        return result
+        try:
+            mid = SmUserMember.query.filter(
+                and_(SmUserMember.ID == uid, SmUserMember.Forbidden == 0, SmUserMember.Lock == 0)).first()
+            result = model_to_dict_by_dict(mid)
+            result.pop('Password')
+            result['AgentName'] = mid.sm_user_agent.LoginName
+            result['ClerkName'] = mid.sm_user_agent.NickName
+            return result
+        except Exception as e:
+            current_app.logger.error(e)
+            return None
 

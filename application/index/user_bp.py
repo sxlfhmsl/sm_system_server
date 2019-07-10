@@ -6,7 +6,7 @@ from flask.blueprints import Blueprint
 from flask import request, jsonify
 
 from .utils import BaseView, PermissionView
-from .sta_code import SUCCESS, ERROR_USER_PASSWORD_ERROR
+from .sta_code import SUCCESS, ERROR_USER_LOGIN
 from ..service.user_service import SmUserService
 
 user_bp = Blueprint('user', __name__)
@@ -19,12 +19,12 @@ class UserLoginView(BaseView):
 
     def dispatch_request(self):
         token = SmUserService.login(request.json['LoginName'], request.json['Password'])
-        if token:
+        if not isinstance(token, int):
             success = SUCCESS()
             success['data'] = {'token': token}
             return jsonify(success)
         else:
-            return jsonify(ERROR_USER_PASSWORD_ERROR)
+            return jsonify(ERROR_USER_LOGIN[token])
 
 
 class UserInfoView(PermissionView):

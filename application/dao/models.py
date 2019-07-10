@@ -210,6 +210,7 @@ class SmUser(db.Model):
     CreatorID = db.Column(db.Integer)
     Forbidden = db.Column(db.Integer, nullable=False)
     RoleID = db.Column(db.ForeignKey('sm_user_role.ID'), index=True)
+    Lock = db.Column(db.Integer, nullable=False)
 
     sm_user_role = db.relationship('SmUserRole', primaryjoin='SmUser.RoleID == SmUserRole.ID', backref='sm_users')
 
@@ -236,7 +237,6 @@ class SmUserAgent(SmUser):
     WithdrawPassWord = db.Column(db.String(30))
     Type = db.Column(db.Integer)
     AgentLevel = db.Column(db.Integer, nullable=False)
-    Lock = db.Column(db.Integer, nullable=False)
 
 
 class SmUserMember(SmUser):
@@ -259,7 +259,6 @@ class SmUserMember(SmUser):
     EmailAddress = db.Column(db.String(50))
     QQNum = db.Column(db.String(20))
     Type = db.Column(db.Integer)
-    Lock = db.Column(db.Integer)
 
     sm_user_agent = db.relationship('SmUserAgent', primaryjoin='SmUserMember.AgentID == SmUserAgent.ID', backref='sm_user_members')
     sm_clerk = db.relationship('SmClerk', primaryjoin='SmUserMember.ClerkID == SmClerk.ID', backref='sm_user_members')
