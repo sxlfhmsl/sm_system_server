@@ -14,6 +14,8 @@ def check_auth(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         auth = request.headers.get('auth', None)
+        if auth is None:
+            abort(404)
         token = RedisOp().get_normal(auth)
         print(auth)
         # 检测不到token

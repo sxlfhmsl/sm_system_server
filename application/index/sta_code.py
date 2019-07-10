@@ -20,3 +20,6 @@ ERROR_USER_LOGIN = [
     {'code': 10003, 'msg': '账户被锁定'}
 ]
 
+# 提交参数错误
+POST_PARA_ERROR = {'code': 10100, 'msg': '提交参数错误'}
+

@@ -3,10 +3,10 @@
 用户登录接口
 """
 from flask.blueprints import Blueprint
-from flask import request, jsonify
+from flask import request, jsonify, abort, g
 
 from .utils import BaseView, PermissionView
-from .sta_code import SUCCESS, ERROR_USER_LOGIN
+from .sta_code import SUCCESS, ERROR_USER_LOGIN, POST_PARA_ERROR
 from ..service.user_service import SmUserService
 
 user_bp = Blueprint('user', __name__)
@@ -48,6 +48,32 @@ class UserInfoView(PermissionView):
         return jsonify(success)
 
 
+class CreateAdmin(PermissionView):
+    """
+    创建管理员
+    """
+
+    def response_admin(self):
+        if request.json is None or len(request.json) == 0:
+            return jsonify(POST_PARA_ERROR)
+        # 添加参数
+        g.CreatorID = self._uid
+        g.LoginName = request.json.get('LoginName', None)
+        g.NickName = request.json.get('NickName', None)
+        g.Password = request.json.get('Password', None)
+        if SmUserService.create_admin() != 0:
+            return jsonify(POST_PARA_ERROR)
+        else:
+            return jsonify(SUCCESS())
+
+    def response_agent(self):
+        abort(404)
+
+    def response_member(self):
+        abort(404)
+
+
 user_bp.add_url_rule('/login', methods=['POST'], view_func=UserLoginView.as_view('user_login'))
 user_bp.add_url_rule('/info', methods=['POST'], view_func=UserInfoView.as_view('user_info'))
+user_bp.add_url_rule('/create_admin', methods=['POST'], view_func=CreateAdmin.as_view('create_admin'))
 

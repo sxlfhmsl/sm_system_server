@@ -3,7 +3,7 @@
 用户service,<class 'sqlalchemy.util._collections.result'>
 """
 import datetime
-from flask import current_app
+from flask import current_app, g
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased, outerjoin
 from hashlib import sha256
@@ -117,4 +117,27 @@ class SmUserService:
         except Exception as e:
             current_app.logger.error(e)
             return None
+
+    @classmethod
+    def create_admin(cls):
+        if g.LoginName is None or g.NickName is None or g.Password is None:
+            return 1
+        date_time_now = datetime.datetime.now()
+        try:
+            # 确定用户名是否存在
+            user = SmUser.query.filter(SmUser.LoginName == g.LoginName).first()
+            if user is not None:
+                return 1
+            user = SmUserAdmin(
+                LoginName=g.LoginName, NickName=g.NickName, Password=sha256(g.Password.encode()).hexdigest(),
+                CreatorID=g.CreatorID, CreateTime=date_time_now, RoleID=1, Forbidden=0, Lock=0)
+            print(SmUser.__table__)
+            db.session.add(user)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            current_app.logger.error(e)
+            return 1
+        return 0
 
