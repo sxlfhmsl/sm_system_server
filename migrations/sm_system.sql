@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50712
 File Encoding         : 65001
 
-Date: 2019-07-11 00:38:39
+Date: 2019-07-12 00:46:05
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -328,6 +328,9 @@ CREATE TABLE `sm_user` (
 -- ----------------------------
 -- Records of sm_user
 -- ----------------------------
+INSERT INTO `sm_user` VALUES ('1', 'superadmin', 'superadmin', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-12 00:19:19', '2019-07-12 00:19:19', null, '0', 'eabbb5362bedec4981e460c40e60a55b', '0');
+INSERT INTO `sm_user` VALUES ('b613c86ade5f190f903ac5af1f4c09f5', 'admin_001', 'papa', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-12 00:43:41', null, 'f990331de19891d9390b7709a8e65b1d', '0', 'eabbb5362bedec4981e460c40e60a55b', '0');
+INSERT INTO `sm_user` VALUES ('f990331de19891d9390b7709a8e65b1d', 'admin', 'papa', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-12 00:42:56', '2019-07-12 00:42:56', '1', '0', 'eabbb5362bedec4981e460c40e60a55b', '0');
 
 -- ----------------------------
 -- Table structure for sm_user_admin
@@ -342,6 +345,9 @@ CREATE TABLE `sm_user_admin` (
 -- ----------------------------
 -- Records of sm_user_admin
 -- ----------------------------
+INSERT INTO `sm_user_admin` VALUES ('1');
+INSERT INTO `sm_user_admin` VALUES ('b613c86ade5f190f903ac5af1f4c09f5');
+INSERT INTO `sm_user_admin` VALUES ('f990331de19891d9390b7709a8e65b1d');
 
 -- ----------------------------
 -- Table structure for sm_user_agent
@@ -388,6 +394,18 @@ CREATE TABLE `sm_user_log` (
 -- ----------------------------
 -- Records of sm_user_log
 -- ----------------------------
+INSERT INTO `sm_user_log` VALUES ('07267ac22a0d2855b14f93be5dcaf2c0', '1', '管理员', '登录', '2019-07-12 00:00:06', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('1d7c8e6908e81dd207da38e3dcb1990d', 'f990331de19891d9390b7709a8e65b1d', '管理员', '创建管理员', '2019-07-12 00:43:41', '管理员创建管理员');
+INSERT INTO `sm_user_log` VALUES ('1e2e58430b9f3c8ce8fa29eaf46691e1', '1', '管理员', '登录', '2019-07-12 00:00:04', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('2f2135944d39653fd00593c3128c7df8', 'f990331de19891d9390b7709a8e65b1d', '管理员', '登录', '2019-07-12 00:42:56', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('38f10efd6bb8cebd8d05b9de5df8a17a', '1', '管理员', '登录', '2019-07-12 00:00:06', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('3aa25b070f5260c805ee7a0fbf8396c0', '1', '管理员', '登录', '2019-07-12 00:00:05', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('507aac6b0b80e8eac3737a624f7ed346', '1', '管理员', '登录', '2019-07-12 00:00:00', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('5706d3d4b01bfa3a376ad749de53d928', '1', '管理员', '登录', '2019-07-12 00:19:19', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('6bd2e1dd69c72cff55f7ddd379d0c37d', '1', '管理员', '创建管理员', '2019-07-12 00:41:22', '管理员创建管理员');
+INSERT INTO `sm_user_log` VALUES ('775a76058c0044460829f99a6e4e93f9', '1', '管理员', '登录', '2019-07-12 00:10:09', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('a169a4159c7ded88780a81b81a066390', '1', '管理员', '登录', '2019-07-12 00:00:07', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('be28e530c8fc5cb76fdc1e3938d8716e', '1', '管理员', '登录', '2019-07-12 00:11:08', '管理员登录');
 
 -- ----------------------------
 -- Table structure for sm_user_member
@@ -437,3 +455,6 @@ CREATE TABLE `sm_user_role` (
 -- ----------------------------
 -- Records of sm_user_role
 -- ----------------------------
+INSERT INTO `sm_user_role` VALUES ('2800d5549b224f0e0a36be4880830f8b', 'Member', '会员');
+INSERT INTO `sm_user_role` VALUES ('dcf76f2e05fc5394efe44f5b23cb3a9a', 'Agent', '代理');
+INSERT INTO `sm_user_role` VALUES ('eabbb5362bedec4981e460c40e60a55b', 'Admin', '管理员');
