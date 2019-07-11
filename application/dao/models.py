@@ -11,7 +11,7 @@ db = SQLAlchemy()
 class SmAgentDrawing(db.Model):
     __tablename__ = 'sm_agent_drawing'
 
-    ID = db.Column(db.Integer, primary_key=True)
+    ID = db.Column(db.String(64), primary_key=True)
     AgentID = db.Column(db.ForeignKey('sm_user_agent.ID'), nullable=False, index=True)
     DrawingTime = db.Column(db.DateTime, nullable=False)
     DrawingValue = db.Column(db.Float(asdecimal=True), nullable=False)
@@ -27,7 +27,7 @@ class SmAgentDrawing(db.Model):
 class SmBuyTrade(db.Model):
     __tablename__ = 'sm_buy_trade'
 
-    ID = db.Column(db.Integer, primary_key=True)
+    ID = db.Column(db.String(64), primary_key=True)
     Number = db.Column(db.String(30), nullable=False)
     MemberID = db.Column(db.ForeignKey('sm_user_member.ID'), nullable=False, index=True)
     TradeTime = db.Column(db.DateTime, nullable=False)
@@ -45,7 +45,7 @@ class SmBuyTrade(db.Model):
 class SmClerk(db.Model):
     __tablename__ = 'sm_clerk'
 
-    ID = db.Column(db.Integer, primary_key=True)
+    ID = db.Column(db.String(64), primary_key=True)
     AgentID = db.Column(db.ForeignKey('sm_user_agent.ID'), nullable=False, index=True)
     NickName = db.Column(db.String(255))
     Forbidden = db.Column(db.Integer)
@@ -56,7 +56,7 @@ class SmClerk(db.Model):
 class SmClosePlan(db.Model):
     __tablename__ = 'sm_close_plan'
 
-    ID = db.Column(db.Integer, primary_key=True)
+    ID = db.Column(db.String(64), primary_key=True)
     CreatorID = db.Column(db.ForeignKey('sm_user_admin.ID', ondelete='SET NULL', onupdate='CASCADE'), index=True)
     PlanDate = db.Column(db.Date, nullable=False)
     Time = db.Column(db.DateTime, nullable=False)
@@ -68,7 +68,7 @@ class SmClosePlan(db.Model):
 class SmManualTrade(db.Model):
     __tablename__ = 'sm_manual_trade'
 
-    ID = db.Column(db.Integer, primary_key=True)
+    ID = db.Column(db.String(64), primary_key=True)
     MemberID = db.Column(db.ForeignKey('sm_user_member.ID'), index=True)
     OpType = db.Column(db.String(20))
     DetailType = db.Column(db.String(50))
@@ -84,7 +84,7 @@ class SmManualTrade(db.Model):
 class SmMemberDrawing(db.Model):
     __tablename__ = 'sm_member_drawing'
 
-    ID = db.Column(db.Integer, primary_key=True)
+    ID = db.Column(db.String(64), primary_key=True)
     MemberID = db.Column(db.ForeignKey('sm_user_member.ID'), nullable=False, index=True)
     DrawingTime = db.Column(db.DateTime)
     DrawingValue = db.Column(db.Float(asdecimal=True), nullable=False)
@@ -102,7 +102,7 @@ class SmMemberDrawing(db.Model):
 class SmRecharge(db.Model):
     __tablename__ = 'sm_recharge'
 
-    Number = db.Column(db.String(50), primary_key=True)
+    Number = db.Column(db.String(64), primary_key=True)
     MemberID = db.Column(db.ForeignKey('sm_user_member.ID'), index=True)
     Value = db.Column(db.Float(asdecimal=True))
     OrderIP = db.Column(db.String(30))
@@ -121,7 +121,7 @@ class SmRecharge(db.Model):
 class SmSellTrade(db.Model):
     __tablename__ = 'sm_sell_trade'
 
-    ID = db.Column(db.Integer, primary_key=True)
+    ID = db.Column(db.String(64), primary_key=True)
     MemberID = db.Column(db.ForeignKey('sm_user_member.ID', ondelete='SET NULL', onupdate='CASCADE'), index=True)
     TickerSymbol = db.Column(db.String(30), nullable=False)
     BuyNumber = db.Column(db.String(30), nullable=False)
@@ -142,7 +142,7 @@ class SmSellTrade(db.Model):
 class SmStockPara(db.Model):
     __tablename__ = 'sm_stock_para'
 
-    TickerSymbol = db.Column(db.String(30), primary_key=True)
+    TickerSymbol = db.Column(db.String(64), primary_key=True)
     Name = db.Column(db.String(50))
     Abridge = db.Column(db.String(30))
     Type = db.Column(db.String(30))
@@ -168,7 +168,7 @@ class SmSysConf(db.Model):
 class SmSysNotice(db.Model):
     __tablename__ = 'sm_sys_notice'
 
-    ID = db.Column(db.Integer, primary_key=True)
+    ID = db.Column(db.String(64), primary_key=True)
     CreatorID = db.Column(db.ForeignKey('sm_user_admin.ID', ondelete='SET NULL', onupdate='CASCADE'), index=True)
     Title = db.Column(db.String(50))
     Content = db.Column(db.String(255))
@@ -182,7 +182,7 @@ class SmSysNotice(db.Model):
 class SmTradeBill(db.Model):
     __tablename__ = 'sm_trade_bill'
 
-    ID = db.Column(db.Integer, primary_key=True)
+    ID = db.Column(db.String(64), primary_key=True)
     Number = db.Column(db.String(30), nullable=False)
     TradeType = db.Column(db.Integer, nullable=False)
     MemberID = db.Column(db.ForeignKey('sm_user_member.ID'), index=True)
@@ -201,13 +201,13 @@ class SmTradeBill(db.Model):
 class SmUser(db.Model):
     __tablename__ = 'sm_user'
 
-    ID = db.Column(db.Integer, primary_key=True, nullable=False)
+    ID = db.Column(db.String(64), primary_key=True, nullable=False)
     LoginName = db.Column(db.String(64), primary_key=True, nullable=False)
     NickName = db.Column(db.String(64), nullable=False)
     Password = db.Column(db.String(255), nullable=False)
     CreateTime = db.Column(db.DateTime, nullable=False)
     LastLogonTime = db.Column(db.DateTime)
-    CreatorID = db.Column(db.Integer)
+    CreatorID = db.Column(db.String(64))
     Forbidden = db.Column(db.Integer, nullable=False)
     RoleID = db.Column(db.ForeignKey('sm_user_role.ID'), index=True)
     Lock = db.Column(db.Integer, nullable=False)
@@ -267,7 +267,7 @@ class SmUserMember(SmUser):
 class SmUserLog(db.Model):
     __tablename__ = 'sm_user_log'
 
-    ID = db.Column(db.Integer, primary_key=True)
+    ID = db.Column(db.String(64), primary_key=True)
     UserID = db.Column(db.ForeignKey('sm_user.ID', ondelete='SET NULL', onupdate='CASCADE'), index=True)
     Type = db.Column(db.String(50))
     Model = db.Column(db.String(50))
@@ -280,6 +280,6 @@ class SmUserLog(db.Model):
 class SmUserRole(db.Model):
     __tablename__ = 'sm_user_role'
 
-    ID = db.Column(db.Integer, primary_key=True)
+    ID = db.Column(db.String(64), primary_key=True)
     Name = db.Column(db.String(50), nullable=False)
     Description = db.Column(db.String(255))
