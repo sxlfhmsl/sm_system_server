@@ -62,10 +62,10 @@ class PermissionView(BaseView):
         self._token_data = token_dict['data']
         self._uid = self._token_data['uid']
         self._u_type = self._token_data['utype']
-        if self._u_type == 1:
+        if self._u_type == 'Admin':
             return self.response_admin()
-        elif self._u_type == 2:
+        elif self._u_type == 'Agent':
             return self.response_agent()
-        elif self._u_type == 3:
+        elif self._u_type == 'Member':
             return self.response_member()
 

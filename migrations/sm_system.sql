@@ -34,8 +34,8 @@ INSERT INTO `alembic_version` VALUES ('768b6b5afa5a');
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_agent_drawing`;
 CREATE TABLE `sm_agent_drawing` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '提款ID',
-  `AgentID` int(11) unsigned NOT NULL COMMENT '目标账户ID',
+  `ID` varchar(64) NOT NULL COMMENT '提款ID',
+  `AgentID` varchar(64) NOT NULL COMMENT '目标账户ID',
   `DrawingTime` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '提款日期',
   `DrawingValue` double NOT NULL COMMENT '提款金额',
   `Bank` varchar(50) DEFAULT NULL COMMENT '银行',
@@ -57,9 +57,9 @@ CREATE TABLE `sm_agent_drawing` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_buy_trade`;
 CREATE TABLE `sm_buy_trade` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '持仓id',
+  `ID` varchar(64) NOT NULL COMMENT '持仓id',
   `Number` varchar(30) NOT NULL COMMENT '单号',
-  `MemberID` int(11) unsigned NOT NULL COMMENT '会员ID',
+  `MemberID` varchar(64) NOT NULL COMMENT '会员ID',
   `TradeTime` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '购买时间',
   `TickerSymbol` varchar(30) NOT NULL COMMENT '股票代码',
   `Price` double NOT NULL COMMENT '购买价格',
@@ -82,14 +82,14 @@ CREATE TABLE `sm_buy_trade` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_clerk`;
 CREATE TABLE `sm_clerk` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '业务员ID',
-  `AgentID` int(11) unsigned NOT NULL COMMENT '创建的代理的ID',
+  `ID` varchar(64) NOT NULL COMMENT '业务员ID',
+  `AgentID` varchar(64) NOT NULL COMMENT '创建的代理的ID',
   `NickName` varchar(255) DEFAULT NULL COMMENT '名称',
   `Forbidden` tinyint(1) DEFAULT NULL COMMENT '是否禁用，默认不禁用',
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_5` (`AgentID`),
   CONSTRAINT `FK_Reference_5` FOREIGN KEY (`AgentID`) REFERENCES `sm_user_agent` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='业务员表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='业务员表';
 
 -- ----------------------------
 -- Records of sm_clerk
@@ -101,8 +101,8 @@ INSERT INTO `sm_clerk` VALUES ('1', '3', '0', '0');
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_close_plan`;
 CREATE TABLE `sm_close_plan` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
-  `CreatorID` int(11) unsigned DEFAULT NULL COMMENT '管理员ID',
+  `ID` varchar(64) NOT NULL COMMENT '编号',
+  `CreatorID` varchar(64) DEFAULT NULL COMMENT '管理员ID',
   `PlanDate` date NOT NULL COMMENT '休市日期',
   `Time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
   `Note` varchar(255) DEFAULT NULL COMMENT '备注',
@@ -120,11 +120,11 @@ CREATE TABLE `sm_close_plan` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_manual_trade`;
 CREATE TABLE `sm_manual_trade` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `MemberID` int(11) unsigned DEFAULT NULL COMMENT '会员id',
+  `ID` varchar(64) NOT NULL COMMENT '主键',
+  `MemberID` varchar(64) DEFAULT NULL COMMENT '会员id',
   `OpType` varchar(20) DEFAULT NULL COMMENT '操作类型',
   `DetailType` varchar(50) DEFAULT NULL,
-  `CreatorID` int(11) unsigned DEFAULT NULL COMMENT '管理员ID',
+  `CreatorID` varchar(64) DEFAULT NULL COMMENT '管理员ID',
   `CreateTime` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
   `Value` int(11) unsigned NOT NULL COMMENT '金额',
   `Note` varchar(255) DEFAULT NULL COMMENT '备注',
@@ -144,8 +144,8 @@ CREATE TABLE `sm_manual_trade` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_member_drawing`;
 CREATE TABLE `sm_member_drawing` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '会员提款ID',
-  `MemberID` int(11) unsigned NOT NULL COMMENT '会员ID',
+  `ID` varchar(64) NOT NULL COMMENT '会员提款ID',
+  `MemberID` varchar(64) NOT NULL COMMENT '会员ID',
   `DrawingTime` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '提款日期',
   `DrawingValue` double NOT NULL COMMENT '提款金额',
   `Bank` varchar(50) DEFAULT NULL COMMENT '银行',
@@ -169,8 +169,8 @@ CREATE TABLE `sm_member_drawing` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_recharge`;
 CREATE TABLE `sm_recharge` (
-  `Number` varchar(50) NOT NULL COMMENT '订单号',
-  `MemberID` int(11) unsigned DEFAULT NULL COMMENT '参与者',
+  `Number` varchar(64) NOT NULL COMMENT '订单号',
+  `MemberID` varchar(64) DEFAULT NULL COMMENT '参与者',
   `Value` double DEFAULT NULL COMMENT '充值金额',
   `OrderIP` varchar(30) DEFAULT NULL COMMENT '下单的IP',
   `CreateTime` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -195,8 +195,8 @@ CREATE TABLE `sm_recharge` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_sell_trade`;
 CREATE TABLE `sm_sell_trade` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '平仓ID',
-  `MemberID` int(11) unsigned DEFAULT NULL COMMENT '会员ID',
+  `ID` varchar(64) NOT NULL COMMENT '平仓ID',
+  `MemberID` varchar(64) DEFAULT NULL COMMENT '会员ID',
   `TickerSymbol` varchar(30) NOT NULL COMMENT '股票代码',
   `BuyNumber` varchar(30) NOT NULL COMMENT '购买单号',
   `BuyTime` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '购买时间',
@@ -223,7 +223,7 @@ CREATE TABLE `sm_sell_trade` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_stock_para`;
 CREATE TABLE `sm_stock_para` (
-  `TickerSymbol` varchar(30) NOT NULL COMMENT '股票代码',
+  `TickerSymbol` varchar(64) NOT NULL COMMENT '股票代码',
   `Name` varchar(50) DEFAULT NULL COMMENT '股票名称',
   `Abridge` varchar(30) DEFAULT NULL COMMENT '拼音缩写',
   `Type` varchar(30) DEFAULT NULL COMMENT '股票类型',
@@ -263,8 +263,8 @@ CREATE TABLE `sm_sys_conf` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_sys_notice`;
 CREATE TABLE `sm_sys_notice` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '公告编号',
-  `CreatorID` int(11) unsigned DEFAULT NULL COMMENT '创建者ID',
+  `ID` varchar(64) NOT NULL COMMENT '公告编号',
+  `CreatorID` varchar(64) DEFAULT NULL COMMENT '创建者ID',
   `Title` varchar(50) DEFAULT NULL COMMENT '标题',
   `Content` varchar(255) DEFAULT NULL COMMENT '内容',
   `Time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -284,10 +284,10 @@ CREATE TABLE `sm_sys_notice` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_trade_bill`;
 CREATE TABLE `sm_trade_bill` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '交易账单ID',
+  `ID` varchar(64) NOT NULL COMMENT '交易账单ID',
   `Number` varchar(30) NOT NULL COMMENT '交易单号',
   `TradeType` int(5) unsigned NOT NULL COMMENT '交易类型',
-  `MemberID` int(11) unsigned DEFAULT NULL COMMENT '会员ID',
+  `MemberID` varchar(64) DEFAULT NULL COMMENT '会员ID',
   `TickerSymbol` varchar(30) NOT NULL COMMENT '股票代码',
   `TickerName` varchar(30) NOT NULL COMMENT '股票名称',
   `UnitPrice` double NOT NULL COMMENT '单价',
@@ -310,35 +310,31 @@ CREATE TABLE `sm_trade_bill` (
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_user`;
 CREATE TABLE `sm_user` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '管理员表ID主键',
+  `ID` varchar(64) NOT NULL COMMENT '管理员表ID主键',
   `LoginName` varchar(64) NOT NULL COMMENT '登录名',
   `NickName` varchar(64) NOT NULL COMMENT '昵称',
   `Password` varchar(255) NOT NULL COMMENT '密码',
   `CreateTime` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
   `LastLogonTime` datetime DEFAULT NULL COMMENT '上次登录时间',
-  `CreatorID` int(11) unsigned DEFAULT NULL COMMENT '创建者ID',
+  `CreatorID` varchar(64) DEFAULT NULL COMMENT '创建者ID',
   `Forbidden` tinyint(1) unsigned zerofill NOT NULL COMMENT '是否禁用， 默认不禁用',
-  `RoleID` int(11) unsigned DEFAULT NULL COMMENT '用户类型ID',
+  `RoleID` varchar(64) DEFAULT NULL COMMENT '用户类型ID',
   `Lock` tinyint(1) unsigned zerofill NOT NULL,
   PRIMARY KEY (`ID`,`LoginName`),
   KEY `FK_Reference_4` (`RoleID`),
   CONSTRAINT `FK_Reference_4` FOREIGN KEY (`RoleID`) REFERENCES `sm_user_role` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8 COMMENT='用户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户表';
 
 -- ----------------------------
 -- Records of sm_user
 -- ----------------------------
-INSERT INTO `sm_user` VALUES ('1', 'superadmin', 'superadmin', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-10 23:56:46', '2019-07-10 23:56:47', null, '0', '1', '0');
-INSERT INTO `sm_user` VALUES ('2', 'admin', 'admin', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-09 22:06:59', '2019-07-09 22:06:59', '1', '0', '1', '0');
-INSERT INTO `sm_user` VALUES ('3', 'agent', 'agent', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-10 22:39:05', '2019-07-10 22:39:06', '2', '0', '2', '0');
-INSERT INTO `sm_user` VALUES ('4', 'member', 'member', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-10 21:30:10', '2019-07-10 21:30:10', '3', '1', '3', '6');
 
 -- ----------------------------
 -- Table structure for sm_user_admin
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_user_admin`;
 CREATE TABLE `sm_user_admin` (
-  `ID` int(11) unsigned NOT NULL COMMENT '管理员ID',
+  `ID` varchar(64) NOT NULL COMMENT '管理员ID',
   PRIMARY KEY (`ID`),
   CONSTRAINT `FK_Reference_1` FOREIGN KEY (`ID`) REFERENCES `sm_user` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='管理员表';
@@ -346,15 +342,13 @@ CREATE TABLE `sm_user_admin` (
 -- ----------------------------
 -- Records of sm_user_admin
 -- ----------------------------
-INSERT INTO `sm_user_admin` VALUES ('1');
-INSERT INTO `sm_user_admin` VALUES ('2');
 
 -- ----------------------------
 -- Table structure for sm_user_agent
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_user_agent`;
 CREATE TABLE `sm_user_agent` (
-  `ID` int(11) unsigned NOT NULL COMMENT '代理ID',
+  `ID` varchar(64) NOT NULL COMMENT '代理ID',
   `Margin` double DEFAULT NULL COMMENT '保证金',
   `TestMargin` double DEFAULT NULL COMMENT '测试保证金',
   `CommissionRatio` double DEFAULT NULL COMMENT '交易佣金分成',
@@ -374,15 +368,14 @@ CREATE TABLE `sm_user_agent` (
 -- ----------------------------
 -- Records of sm_user_agent
 -- ----------------------------
-INSERT INTO `sm_user_agent` VALUES ('3', null, null, null, null, null, null, null, null, null, null, null, '1');
 
 -- ----------------------------
 -- Table structure for sm_user_log
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_user_log`;
 CREATE TABLE `sm_user_log` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '日志id',
-  `UserID` int(11) unsigned DEFAULT NULL COMMENT '操作者',
+  `ID` varchar(64) NOT NULL COMMENT '日志id',
+  `UserID` varchar(64) DEFAULT NULL COMMENT '操作者',
   `Type` varchar(50) DEFAULT NULL COMMENT '操作类型',
   `Model` varchar(50) DEFAULT NULL COMMENT '操作模块',
   `Time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '发生时间',
@@ -390,59 +383,20 @@ CREATE TABLE `sm_user_log` (
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_11` (`UserID`),
   CONSTRAINT `FK_Reference_11` FOREIGN KEY (`UserID`) REFERENCES `sm_user` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8 COMMENT='用户日志记录';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户日志记录';
 
 -- ----------------------------
 -- Records of sm_user_log
 -- ----------------------------
-INSERT INTO `sm_user_log` VALUES ('1', '1', '管理员', '登录', '2019-07-07 21:42:00', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('2', '1', '管理员', '登录', '2019-07-07 21:42:14', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('3', '1', '管理员', '登录', '2019-07-07 21:42:16', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('4', '1', '管理员', '登录', '2019-07-07 21:42:18', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('5', '1', '管理员', '登录', '2019-07-07 21:42:19', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('6', '1', '管理员', '登录', '2019-07-07 21:57:29', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('7', '1', '管理员', '登录', '2019-07-07 21:57:57', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('8', '1', '管理员', '登录', '2019-07-07 21:59:25', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('9', '1', '管理员', '登录', '2019-07-07 22:00:10', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('10', '1', '管理员', '登录', '2019-07-07 22:01:23', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('11', '1', '管理员', '登录', '2019-07-07 22:04:57', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('12', '1', '管理员', '登录', '2019-07-07 22:07:19', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('13', '1', '管理员', '登录', '2019-07-07 22:20:58', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('14', '1', '管理员', '登录', '2019-07-07 22:29:44', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('15', '1', '管理员', '登录', '2019-07-07 22:29:54', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('16', '1', '管理员', '登录', '2019-07-07 22:37:18', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('17', '1', '管理员', '登录', '2019-07-07 22:39:41', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('18', '1', '管理员', '登录', '2019-07-07 22:41:58', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('19', '1', '管理员', '登录', '2019-07-07 22:42:07', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('20', '1', '管理员', '登录', '2019-07-07 23:55:36', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('21', '1', '管理员', '登录', '2019-07-08 21:09:10', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('22', '1', '管理员', '登录', '2019-07-08 21:33:40', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('23', '1', '管理员', '登录', '2019-07-08 21:33:43', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('24', '1', '管理员', '登录', '2019-07-08 21:33:44', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('25', '1', '管理员', '登录', '2019-07-08 21:33:45', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('26', '1', '管理员', '登录', '2019-07-08 22:31:50', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('27', '1', '管理员', '登录', '2019-07-09 21:03:52', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('28', '1', '管理员', '登录', '2019-07-09 22:06:24', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('29', '1', '管理员', '登录', '2019-07-09 23:07:15', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('30', '3', '管理员', '登录', '2019-07-09 23:23:48', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('31', '4', '管理员', '登录', '2019-07-10 00:14:46', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('32', '1', '管理员', '登录', '2019-07-10 21:30:34', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('33', '1', '管理员', '登录', '2019-07-10 21:32:03', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('34', '1', '管理员', '登录', '2019-07-10 21:32:07', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('35', '1', '管理员', '登录', '2019-07-10 22:34:55', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('36', '1', '管理员', '登录', '2019-07-10 22:38:36', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('37', '3', '代理', '登录', '2019-07-10 22:39:06', '代理登录');
-INSERT INTO `sm_user_log` VALUES ('38', '1', '管理员', '登录', '2019-07-10 22:55:52', '管理员登录');
-INSERT INTO `sm_user_log` VALUES ('39', '1', '管理员', '登录', '2019-07-10 23:56:47', '管理员登录');
 
 -- ----------------------------
 -- Table structure for sm_user_member
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_user_member`;
 CREATE TABLE `sm_user_member` (
-  `ID` int(11) unsigned NOT NULL COMMENT '会员ID',
-  `AgentID` int(11) unsigned NOT NULL COMMENT '归属的代理账号id',
-  `ClerkID` int(11) unsigned DEFAULT NULL COMMENT '业务员ID',
+  `ID` varchar(64) NOT NULL COMMENT '会员ID',
+  `AgentID` varchar(64) NOT NULL COMMENT '归属的代理账号id',
+  `ClerkID` varchar(64) DEFAULT NULL COMMENT '业务员ID',
   `CustomerName` varchar(30) DEFAULT NULL COMMENT '客户姓名',
   `Margin` double DEFAULT NULL COMMENT '保证金',
   `PhoneNum` varchar(20) DEFAULT NULL COMMENT '手机号码',
@@ -468,22 +422,18 @@ CREATE TABLE `sm_user_member` (
 -- ----------------------------
 -- Records of sm_user_member
 -- ----------------------------
-INSERT INTO `sm_user_member` VALUES ('4', '3', '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
 -- ----------------------------
 -- Table structure for sm_user_role
 -- ----------------------------
 DROP TABLE IF EXISTS `sm_user_role`;
 CREATE TABLE `sm_user_role` (
-  `ID` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户类型id',
+  `ID` varchar(64) NOT NULL COMMENT '用户类型id',
   `Name` char(50) NOT NULL COMMENT '名称',
   `Description` varchar(255) DEFAULT NULL COMMENT '描述',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='用户组表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户组表';
 
 -- ----------------------------
 -- Records of sm_user_role
 -- ----------------------------
-INSERT INTO `sm_user_role` VALUES ('1', 'admin', '管理员');
-INSERT INTO `sm_user_role` VALUES ('2', 'agent', '代理');
-INSERT INTO `sm_user_role` VALUES ('3', 'member', '会员');

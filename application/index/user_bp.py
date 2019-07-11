@@ -3,7 +3,7 @@
 用户登录接口
 """
 from flask.blueprints import Blueprint
-from flask import request, jsonify, abort, g
+from flask import request, jsonify, abort
 
 from .utils import BaseView, PermissionView
 from .sta_code import SUCCESS, ERROR_USER_LOGIN, POST_PARA_ERROR
@@ -56,12 +56,12 @@ class CreateAdmin(PermissionView):
     def response_admin(self):
         if request.json is None or len(request.json) == 0:
             return jsonify(POST_PARA_ERROR)
-        # 添加参数
-        g.CreatorID = self._uid
-        g.LoginName = request.json.get('LoginName', None)
-        g.NickName = request.json.get('NickName', None)
-        g.Password = request.json.get('Password', None)
-        if SmUserService.create_admin() != 0:
+        if SmUserService.create_admin(
+                CreatorID=self._uid,
+                LoginName=request.json.get('LoginName', None),
+                NickName=request.json.get('NickName', None),
+                Password=request.json.get('Password', None)
+        ) != 0:
             return jsonify(POST_PARA_ERROR)
         else:
             return jsonify(SUCCESS())
