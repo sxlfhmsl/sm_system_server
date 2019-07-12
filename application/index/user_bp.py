@@ -73,7 +73,23 @@ class CreateAdmin(PermissionView):
         abort(404)
 
 
+class CreateAgent(PermissionView):
+    """
+    创建代理
+    """
+
+    def response_admin(self):
+        abort(404)
+
+    def response_agent(self):
+        abort(404)
+
+    def response_member(self):
+        abort(404)
+
+
 user_bp.add_url_rule('/login', methods=['POST'], view_func=UserLoginView.as_view('user_login'))
 user_bp.add_url_rule('/info', methods=['POST'], view_func=UserInfoView.as_view('user_info'))
 user_bp.add_url_rule('/create_admin', methods=['POST'], view_func=CreateAdmin.as_view('create_admin'))
+user_bp.add_url_rule('/create_agent', methods=['POST'], view_func=CreateAgent.as_view('create_agent'))
 
