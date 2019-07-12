@@ -58,7 +58,7 @@ class SmUserService:
             )
             db.session.add(log)
             db.session.commit()
-            token = encode_auth_token(uid=result.ID, utype=role.Name)
+            token = encode_auth_token(uid=result.ID, utypeid=role.ID, utype=role.Name)
             token_key = sha256_generator(token)
             RedisOp().set_normal(token_key, token, 3600)
             # 返回验证码，然后据此获取需求
@@ -149,6 +149,60 @@ class SmUserService:
                 Note=role.Description + '创建管理员'
             )
             db.session.add(user)
+            db.session.add(log)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(e)
+            return 1
+        return 0
+
+    @classmethod
+    def create_agent(cls, uid, utype, **para):
+        date_time_now = datetime.datetime.now()
+        para['Password'] = sha256_generator(para['Password'])
+        try:
+            # 确定用户名是否存在
+            user = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
+            if user is not None:
+                return 1
+            agent = None                                                                       # 待创建代理
+            log = None                                                                         # 日志
+            # 获取role-----agent
+            role = SmUserRole.query.filter(SmUserRole.Name == 'Agent').first()
+            if utype == 'Admin':
+                # 获取创建者
+                creator = SmUserAdmin.query.filter(SmUserAdmin.ID == uid).first()
+                agent = SmUserAgent(
+                    ID=md5_generator('sm_user_agent' + str(date_time_now)), CreatorID=uid, AgentLevel=1,
+                    CreateTime=date_time_now, RoleID=role.ID, Forbidden=0, Lock=0, **para)
+                log = SmUserLog(
+                    ID=md5_generator('sm_user_log' + str(date_time_now)),
+                    UserID=uid,
+                    Type=role.Description,
+                    Model='创建代理',
+                    Time=date_time_now,
+                    Note='管理员' + creator.LoginName + '创建代理' + para['LoginName']
+                )
+            if utype == 'Agent':
+                # 获取创建者
+                creator = SmUserAgent.query.filter(SmUserAgent.ID == uid).first()
+                if creator.AgentLevel >= 4:
+                    # 创建者等级过低
+                    return 2
+                agent = SmUserAgent(
+                    ID=md5_generator('sm_user_agent' + str(date_time_now)), CreatorID=uid,
+                    AgentLevel=creator.AgentLevel + 1,
+                    CreateTime=date_time_now, RoleID=role.ID, Forbidden=0, Lock=0, **para)
+                log = SmUserLog(
+                    ID=md5_generator('sm_user_log' + str(date_time_now)),
+                    UserID=uid,
+                    Type=role.Description,
+                    Model='创建代理',
+                    Time=date_time_now,
+                    Note='管理员' + creator.LoginName + '创建代理' + para['LoginName']
+                )
+            db.session.add(agent)
             db.session.add(log)
             db.session.commit()
         except Exception as e:
