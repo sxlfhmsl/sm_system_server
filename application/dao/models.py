@@ -135,6 +135,7 @@ class SmSellTrade(db.Model):
     Interest = db.Column(db.Float(asdecimal=True), nullable=False)
     StampDuty = db.Column(db.Float(asdecimal=True), nullable=False)
     Profit = db.Column(db.Float(asdecimal=True), nullable=False)
+    Hands = db.Column(db.Integer, nullable=False)
 
     sm_user_member = db.relationship('SmUserMember', primaryjoin='SmSellTrade.MemberID == SmUserMember.ID', backref='sm_sell_trades')
 

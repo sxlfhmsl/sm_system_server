@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50712
 File Encoding         : 65001
 
-Date: 2019-07-12 00:46:05
+Date: 2019-07-13 20:19:20
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -209,6 +209,7 @@ CREATE TABLE `sm_sell_trade` (
   `Interest` double NOT NULL COMMENT '融资利息',
   `StampDuty` double NOT NULL COMMENT '印花税',
   `Profit` double NOT NULL COMMENT '收益',
+  `Hands` int(10) unsigned NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_9` (`MemberID`),
   CONSTRAINT `FK_Reference_9` FOREIGN KEY (`MemberID`) REFERENCES `sm_user_member` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -329,8 +330,12 @@ CREATE TABLE `sm_user` (
 -- Records of sm_user
 -- ----------------------------
 INSERT INTO `sm_user` VALUES ('1', 'superadmin', 'superadmin', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-12 00:19:19', '2019-07-12 00:19:19', null, '0', 'eabbb5362bedec4981e460c40e60a55b', '0');
+INSERT INTO `sm_user` VALUES ('39e4f8e100a58edaef0305675ec122fe', 'agent', 'papa', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-13 01:35:29', '2019-07-13 01:35:30', 'f990331de19891d9390b7709a8e65b1d', '0', 'dcf76f2e05fc5394efe44f5b23cb3a9a', '0');
 INSERT INTO `sm_user` VALUES ('b613c86ade5f190f903ac5af1f4c09f5', 'admin_001', 'papa', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-12 00:43:41', null, 'f990331de19891d9390b7709a8e65b1d', '0', 'eabbb5362bedec4981e460c40e60a55b', '0');
-INSERT INTO `sm_user` VALUES ('f990331de19891d9390b7709a8e65b1d', 'admin', 'papa', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-12 00:42:56', '2019-07-12 00:42:56', '1', '0', 'eabbb5362bedec4981e460c40e60a55b', '0');
+INSERT INTO `sm_user` VALUES ('b6667718cb6b3d0897cbb32ebf8178cc', 'agent_002', 'papa', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-13 01:39:42', '2019-07-13 01:39:42', 'bb02bad0b6d8283288bb629dcd3626bb', '0', 'dcf76f2e05fc5394efe44f5b23cb3a9a', '0');
+INSERT INTO `sm_user` VALUES ('bb02bad0b6d8283288bb629dcd3626bb', 'agent_001', 'papa', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-13 01:39:05', '2019-07-13 01:39:06', '39e4f8e100a58edaef0305675ec122fe', '0', 'dcf76f2e05fc5394efe44f5b23cb3a9a', '0');
+INSERT INTO `sm_user` VALUES ('c3352ad4f4352d62f3956b574a4aebf6', 'agent_003', 'papa', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-13 01:40:09', '2019-07-13 01:40:09', 'b6667718cb6b3d0897cbb32ebf8178cc', '0', 'dcf76f2e05fc5394efe44f5b23cb3a9a', '0');
+INSERT INTO `sm_user` VALUES ('f990331de19891d9390b7709a8e65b1d', 'admin', 'papa', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-13 01:30:01', '2019-07-13 01:30:02', '1', '0', 'eabbb5362bedec4981e460c40e60a55b', '0');
 
 -- ----------------------------
 -- Table structure for sm_user_admin
@@ -374,6 +379,10 @@ CREATE TABLE `sm_user_agent` (
 -- ----------------------------
 -- Records of sm_user_agent
 -- ----------------------------
+INSERT INTO `sm_user_agent` VALUES ('39e4f8e100a58edaef0305675ec122fe', null, null, null, null, null, null, null, null, null, null, null, '1');
+INSERT INTO `sm_user_agent` VALUES ('b6667718cb6b3d0897cbb32ebf8178cc', null, null, null, null, null, null, null, null, null, null, null, '3');
+INSERT INTO `sm_user_agent` VALUES ('bb02bad0b6d8283288bb629dcd3626bb', null, null, null, null, null, null, null, null, null, null, null, '2');
+INSERT INTO `sm_user_agent` VALUES ('c3352ad4f4352d62f3956b574a4aebf6', null, null, null, null, null, null, null, null, null, null, null, '4');
 
 -- ----------------------------
 -- Table structure for sm_user_log
@@ -395,17 +404,28 @@ CREATE TABLE `sm_user_log` (
 -- Records of sm_user_log
 -- ----------------------------
 INSERT INTO `sm_user_log` VALUES ('07267ac22a0d2855b14f93be5dcaf2c0', '1', '管理员', '登录', '2019-07-12 00:00:06', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('116dba2a815de32354059cab67740bb4', 'f990331de19891d9390b7709a8e65b1d', '代理', '创建代理', '2019-07-13 01:34:38', '管理员admin创建代理agent');
 INSERT INTO `sm_user_log` VALUES ('1d7c8e6908e81dd207da38e3dcb1990d', 'f990331de19891d9390b7709a8e65b1d', '管理员', '创建管理员', '2019-07-12 00:43:41', '管理员创建管理员');
 INSERT INTO `sm_user_log` VALUES ('1e2e58430b9f3c8ce8fa29eaf46691e1', '1', '管理员', '登录', '2019-07-12 00:00:04', '管理员登录');
 INSERT INTO `sm_user_log` VALUES ('2f2135944d39653fd00593c3128c7df8', 'f990331de19891d9390b7709a8e65b1d', '管理员', '登录', '2019-07-12 00:42:56', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('310ccab7f38c648a2f414c9ce77182ce', 'bb02bad0b6d8283288bb629dcd3626bb', '代理', '创建代理', '2019-07-13 01:39:24', '管理员agent_001创建代理agent_002');
 INSERT INTO `sm_user_log` VALUES ('38f10efd6bb8cebd8d05b9de5df8a17a', '1', '管理员', '登录', '2019-07-12 00:00:06', '管理员登录');
 INSERT INTO `sm_user_log` VALUES ('3aa25b070f5260c805ee7a0fbf8396c0', '1', '管理员', '登录', '2019-07-12 00:00:05', '管理员登录');
 INSERT INTO `sm_user_log` VALUES ('507aac6b0b80e8eac3737a624f7ed346', '1', '管理员', '登录', '2019-07-12 00:00:00', '管理员登录');
 INSERT INTO `sm_user_log` VALUES ('5706d3d4b01bfa3a376ad749de53d928', '1', '管理员', '登录', '2019-07-12 00:19:19', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('62402ecad66c65b6131d529304617c31', '39e4f8e100a58edaef0305675ec122fe', '代理', '创建代理', '2019-07-13 01:38:24', '管理员agent创建代理agent_001');
 INSERT INTO `sm_user_log` VALUES ('6bd2e1dd69c72cff55f7ddd379d0c37d', '1', '管理员', '创建管理员', '2019-07-12 00:41:22', '管理员创建管理员');
+INSERT INTO `sm_user_log` VALUES ('774f698ae4b6b21dc582731816dac746', 'bb02bad0b6d8283288bb629dcd3626bb', '代理', '登录', '2019-07-13 01:39:06', '代理登录');
 INSERT INTO `sm_user_log` VALUES ('775a76058c0044460829f99a6e4e93f9', '1', '管理员', '登录', '2019-07-12 00:10:09', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('91b78591d1c9ef0e0f8f2691beabc2a3', '39e4f8e100a58edaef0305675ec122fe', '代理', '登录', '2019-07-13 01:35:30', '代理登录');
 INSERT INTO `sm_user_log` VALUES ('a169a4159c7ded88780a81b81a066390', '1', '管理员', '登录', '2019-07-12 00:00:07', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('a96235acc146c90604a0ae144a6a429e', 'f990331de19891d9390b7709a8e65b1d', '代理', '创建代理', '2019-07-13 01:31:14', '管理员admin创建代理agent');
+INSERT INTO `sm_user_log` VALUES ('a9b8b39b8f01e037a492d9f9bb49c11a', '39e4f8e100a58edaef0305675ec122fe', '代理', '创建代理', '2019-07-13 01:35:47', '管理员agent创建代理agent');
+INSERT INTO `sm_user_log` VALUES ('acce444572942b88d3b09e76c81569df', 'c3352ad4f4352d62f3956b574a4aebf6', '代理', '登录', '2019-07-13 01:40:09', '代理登录');
 INSERT INTO `sm_user_log` VALUES ('be28e530c8fc5cb76fdc1e3938d8716e', '1', '管理员', '登录', '2019-07-12 00:11:08', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('d9a7c44851a53c3521f04500630f9e8e', 'b6667718cb6b3d0897cbb32ebf8178cc', '代理', '创建代理', '2019-07-13 01:39:59', '管理员agent_002创建代理agent_003');
+INSERT INTO `sm_user_log` VALUES ('e75c81d4e2a4f1fb5f8651e3935ac67c', 'f990331de19891d9390b7709a8e65b1d', '管理员', '登录', '2019-07-13 01:30:02', '管理员登录');
+INSERT INTO `sm_user_log` VALUES ('fea48283d2888acd201154b84c1aabfe', 'b6667718cb6b3d0897cbb32ebf8178cc', '代理', '登录', '2019-07-13 01:39:42', '代理登录');
 
 -- ----------------------------
 -- Table structure for sm_user_member
