@@ -7,7 +7,7 @@ from flask import request, jsonify, abort
 
 from .utils import BaseView, PermissionView
 from .sta_code import SUCCESS, USER_NAME_PASS_WRONG_ERROR, USER_FORBIDDEN_ERROR, USER_LOCK_ERROR, OTHER_ERROR
-from .sta_code import PERMISSION_DENIED_ERROR
+from .sta_code import PERMISSION_DENIED_ERROR, USER_SAME_LOGIN_NAME, POST_PARA_ERROR
 from ..service.user_service import SmUserService
 from ..service.user_admin_service import SmUserAdminService
 from ..service.user_agent_service import SmUserAgentService
@@ -41,19 +41,19 @@ class UserInfoView(PermissionView):
     """
 
     def response_admin(self):
-        result = SmUserAdminService.info_by_id(self.u_id)
+        result = SmUserAdminService.info_by_id(self.user)
         if result:
             return jsonify(SUCCESS(result))
         return jsonify(PERMISSION_DENIED_ERROR)
 
     def response_agent(self):
-        result = SmUserAgentService.info_by_id(self.u_id)
+        result = SmUserAgentService.info_by_id(self.user)
         if result:
             return jsonify(SUCCESS(result))
         return jsonify(PERMISSION_DENIED_ERROR)
 
     def response_member(self):
-        result = SmUserMemberService.info_by_id(self.u_id)
+        result = SmUserMemberService.info_by_id(self.user)
         if result:
             return jsonify(SUCCESS(result))
         return jsonify(PERMISSION_DENIED_ERROR)
@@ -66,12 +66,16 @@ class CreateAdmin(PermissionView):
 
     def response_admin(self):
         try:
-            if SmUserAdminService.insert(CreatorID=self.u_id, **request.json) != 0:
-                return jsonify(ERROR_BASE['POST_PARA_ERROR'])
-            else:
+            result = SmUserAdminService.create_admin(CreatorID=self.u_id, **request.json)
+            if result == 0:
                 return jsonify(SUCCESS())
-        except:
-            return jsonify(ERROR_BASE['POST_PARA_ERROR'])
+            elif result == 1:
+                return jsonify(USER_SAME_LOGIN_NAME)
+            elif result == 2:
+                return jsonify(OTHER_ERROR)
+        except:    # 参数解析错误
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
 
     def response_agent(self):
         abort(404)

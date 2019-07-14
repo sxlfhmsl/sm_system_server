@@ -5,8 +5,11 @@
 
 
 # 请求成功
-def SUCCESS(data):
-    return {'code': 0, 'data': data, 'msg': '请求成功!'}
+def SUCCESS(data=None):
+    if data:
+        return {'code': 0, 'data': data, 'msg': '请求成功!'}
+    else:
+        return {'code': 0, 'msg': '请求成功!'}
 
 
 # 系统错误-----10000以下为系统内部错误代码
@@ -26,4 +29,7 @@ PERMISSION_DENIED_ERROR = {'code': 10003, 'msg': '权限不足'}
 USER_NAME_PASS_WRONG_ERROR = {'code': 11001, 'msg': '用户名或密码错误'}
 USER_FORBIDDEN_ERROR = {'code': 11002, 'msg': '用户被禁用'}
 USER_LOCK_ERROR = {'code': 11003, 'msg': '账户被锁定'}
+
+#     用户操作错误
+USER_SAME_LOGIN_NAME = {'code': 11004, 'msg': '登录名已存在，请使用新的登录名'}
 

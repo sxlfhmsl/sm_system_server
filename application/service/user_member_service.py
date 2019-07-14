@@ -16,17 +16,14 @@ class SmUserMemberService(BaseService):
     """
 
     @classmethod
-    def info_by_id(cls, uid):
+    def info_by_id(cls, user):
         """
         获取会员信息
-        :param uid: 目标id
+        :param user: 会员
         :return:
         """
         try:
-            result = cls.is_forbidden(uid, 'Member')
-            if result and result.Lock >= 6 and result.ID != '1':
-                return None
-            return cls.model_to_dict_by_dict(result)
+            return cls.model_to_dict_by_dict(user)
         except Exception as e:
             current_app.logger.error(e)
             return None

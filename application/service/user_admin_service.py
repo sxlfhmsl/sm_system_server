@@ -15,50 +15,54 @@ class SmUserAdminService(BaseService):
     """
 
     @classmethod
-    def info_by_id(cls, uid):
+    def info_by_id(cls, user):
         """
         获取管理员相关信息
-        :param uid: 管理员id
-        :return:
+        :param user: 管理员
+        :return: 成功返回对应字典对象，否者返回None
         """
         try:
-            result = cls.is_forbidden(uid, 'Admin')
-            if result and result.Lock >= 6 and result.ID != '1':
-                return None
-            return cls.model_to_dict_by_dict(result)
+            return cls.model_to_dict_by_dict(user)
         except Exception as e:
             current_app.logger.error(e)
             return None
 
     @classmethod
-    def insert(cls, **para):
+    def add_admin_to_db(cls, **para):
         """
-        创建新的管理员
-        :param para: 相关参数
-        :return:
+        插入管理员到数据库
+        :param para: 参数
+        :return: None
         """
-        # 获取当前时间
-        date_time_now = datetime.datetime.now()
         try:
-            para['Password'] = cls.sha256_generator(para['Password'])
-            # 确定是否存在同名用户 LoginName
-            user = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
-            if user:
-                return 1
-            # 获取管理员权限
-            role = SmUserRole.query.filter(SmUserRole.Name == 'Admin').first()
-            # 待添加用户
-            user = SmUserAdmin(ID=cls.md5_generator('sm_admin_user' + str(date_time_now)),
-                               CreateTime=date_time_now, RoleID=role.ID, Forbidden=0, Lock=0, **para)
-            # 添加日志
-            log = SmUserLog(ID=cls.md5_generator('sm_user_log' + str(date_time_now)), UserID=para['CreatorID'],
-                            Type=role.Description, Model='创建管理员', Time=date_time_now, Note=role.Description + '创建管理员')
+            user = SmUserAdmin(ID=cls.md5_generator('sm_admin_user' + str(para['CreateTime'])), **para)
             db.session.add(user)
-            db.session.add(log)
             db.session.commit()
         except Exception as e:
             db.session.rollback()
+            raise e
+
+    @classmethod
+    def create_admin(cls, **para):
+        """
+        创建新的管理员
+        :param para: 相关参数
+        :return: 返回结果            阐述
+                 0                   管理员创建成功
+                 1                   存在相同的用户名
+                 2                   其他错误
+        """
+        date_time_now = datetime.datetime.now()     # 获取当前时间
+        try:
+            para['Password'] = cls.sha256_generator(para['Password'])
+            user = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()     # 确定是否存在同名用户 LoginName
+            if user:     # 存在相同的用户名
+                return 1
+            role = cls.get_role('Admin')     # 获取管理员权限
+            cls.add_admin_to_db(CreateTime=date_time_now, RoleID=role.ID, Forbidden=0, Lock=0, **para)
+            cls.create_log(para['CreatorID'], role.Description, '创建管理员', date_time_now, role.Description + '创建管理员')
+        except Exception as e:
             current_app.logger.error(e)
-            return 1
+            return 2
         return 0
 

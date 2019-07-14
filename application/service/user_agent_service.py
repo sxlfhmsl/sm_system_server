@@ -16,17 +16,14 @@ class SmUserAgentService(BaseService):
     """
 
     @classmethod
-    def info_by_id(cls, uid):
+    def info_by_id(cls, user):
         """
         获取代理用户信息
-        :param uid:
+        :param user: 代理
         :return:
         """
         try:
-            result = cls.is_forbidden(uid, 'Agent')
-            if result and result.Lock >= 6 and result.ID != '1':
-                return None
-            return cls.model_to_dict_by_dict(result)
+            return cls.model_to_dict_by_dict(user)
         except Exception as e:
             current_app.logger.error(e)
             return None

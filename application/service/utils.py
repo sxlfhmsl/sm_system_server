@@ -6,12 +6,15 @@
 from datetime import datetime
 from hashlib import md5, sha256
 
-from ..dao.models import db, SmUserLog, SmUserAdmin, SmUserAgent, SmUserMember
+from ..dao.models import db, SmUserLog, SmUserAdmin, SmUserAgent, SmUserMember, SmUserRole
 
 
 class BaseService:
 
     from .model_convert import model_to_dict_by_dict
+    AdminRole = None
+    AgentRole = None
+    MemberRole = None
 
     @staticmethod
     def create_log(user_id: str, user_type: str, model: str, time: datetime, note: str):
@@ -52,7 +55,6 @@ class BaseService:
             return None
         return result
 
-
     @staticmethod
     def md5_generator(content: str):
         """
@@ -70,4 +72,24 @@ class BaseService:
         :return:
         """
         return sha256(content.encode()).hexdigest()
+
+    @classmethod
+    def get_role(cls, name: str):
+        """
+        获取role
+        :param name: role的名字， Admin, Agent, Member
+        :return:
+        """
+        if name == 'Admin':
+            if not cls.AdminRole:
+                cls.AdminRole = SmUserRole.query.filter(SmUserRole.Name == 'Admin').first()
+            return cls.AdminRole
+        elif name == 'Agent':
+            if not cls.AgentRole:
+                cls.AgentRole = SmUserRole.query.filter(SmUserRole.Name == 'Agent').first()
+            return cls.AgentRole
+        elif name == 'Member':
+            if not cls.MemberRole:
+                cls.MemberRole = SmUserRole.query.filter(SmUserRole.Name == 'Member').first()
+            return cls.MemberRole
 
