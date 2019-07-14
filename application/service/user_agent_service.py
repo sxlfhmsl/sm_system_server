@@ -54,7 +54,7 @@ class SmUserAgentService(BaseService):
                     Type=role.Description, Model='创建代理', Time=date_time_now,
                     Note='管理员' + creator.LoginName + '创建代理' + para['LoginName']
                 )
-            if token_data['u_role_name'] == 'Agent':
+            elif token_data['u_role_name'] == 'Agent':
                 # 获取创建者
                 creator = SmUserAgent.query.filter(SmUserAgent.ID == token_data['u_id']).first()
                 if creator.AgentLevel >= 4:

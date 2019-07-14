@@ -102,8 +102,31 @@ class CreateAgent(PermissionView):
         abort(404)
 
 
+class CreateMember(PermissionView):
+    """
+    创建会员操作
+    """
+
+    def response_admin(self):
+        try:
+            result = SmUserMemberService.insert(self._token_data, **request.json)
+            if result == 0:                                                        # 添加成功
+                return jsonify(SUCCESS())
+            if result == 1:                                                        # 参数错误
+                return jsonify(ERROR_BASE['POST_PARA_ERROR'])
+        except Exception:
+            return jsonify(ERROR_BASE['POST_PARA_ERROR'])
+
+    def response_agent(self):
+        abort(404)
+
+    def response_member(self):
+        abort(404)
+
+
 user_bp.add_url_rule('/login', methods=['POST'], view_func=UserLoginView.as_view('user_login'))
 user_bp.add_url_rule('/info', methods=['POST'], view_func=UserInfoView.as_view('user_info'))
 user_bp.add_url_rule('/create_admin', methods=['POST'], view_func=CreateAdmin.as_view('create_admin'))
 user_bp.add_url_rule('/create_agent', methods=['POST'], view_func=CreateAgent.as_view('create_agent'))
+user_bp.add_url_rule('/create_member', methods=['POST'], view_func=CreateMember.as_view('create_member'))
 
