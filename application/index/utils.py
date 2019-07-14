@@ -4,10 +4,12 @@
 """
 import functools
 from flask.views import View
-from flask import abort, request
+from flask import abort, request, jsonify
 
+from .sta_code import PERMISSION_DENIED_ERROR
 from ..dao.utils import RedisOp
 from ..service.auth import decode_auth_token
+from ..service.utils import BaseService
 
 
 def check_auth(fn):
@@ -46,6 +48,7 @@ class PermissionView(BaseView):
 
     def __init__(self):
         self._token_data = None
+        self.user = None
         self.u_id = None
         self.u_login_name = None
         self.u_nick_name = None
@@ -63,6 +66,9 @@ class PermissionView(BaseView):
 
     def dispatch_request(self, token_dict: dict):
         self._token_data = token_dict['data']
+        self.user = BaseService.is_forbidden(self._token_data['u_id'], self._token_data['u_role_name'])
+        if self.user is None:
+            return jsonify(PERMISSION_DENIED_ERROR)
         self.u_id = self._token_data['u_id']
         self.u_login_name = self._token_data['u_login_name']
         self.u_nick_name = self._token_data['u_nick_name']
