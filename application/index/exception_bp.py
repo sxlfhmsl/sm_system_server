@@ -14,8 +14,8 @@ def exception_404(error):
     404
     :return:
     """
-    from .sta_code import ERROR_SYSTEM
-    return jsonify(ERROR_SYSTEM['NOTFOUND_ERROR'])
+    from .sta_code import URL_NOTFOUND_ERROR
+    return jsonify(URL_NOTFOUND_ERROR)
 
 
 @exception_bp.app_errorhandler(500)
@@ -24,6 +24,6 @@ def exception_500(error):
     500
     :return:
     """
-    from .sta_code import ERROR_SYSTEM
-    return jsonify(ERROR_SYSTEM['INS_ERROR'])
+    from .sta_code import INS_ERROR
+    return jsonify(INS_ERROR)
 

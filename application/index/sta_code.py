@@ -9,11 +9,9 @@ def SUCCESS():
     return {'code': 0, 'msg': '请求成功!'}
 
 
-# 系统错误
-ERROR_SYSTEM = {
-    'NOTFOUND_ERROR': {'code': 404, 'msg': '请求不存在'},
-    'INS_ERROR': {'code': 500, 'msg': '系统内部错误'}
-}
+# 系统错误-----10000以下为系统内部错误代码
+URL_NOTFOUND_ERROR = {'code': 404, 'msg': '请求不存在'}
+INS_ERROR = {'code': 500, 'msg': '系统内部错误'}
 
 # 基础错误-----提交参数不匹配等
 ERROR_BASE = {
