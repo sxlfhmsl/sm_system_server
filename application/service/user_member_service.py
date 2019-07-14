@@ -29,6 +29,22 @@ class SmUserMemberService(BaseService):
             return None
 
     @classmethod
+    def add_member_to_db(cls, **para):
+        """
+        插入会员到数据库
+        :param para: 参数
+        :return:
+        """
+        session = db.session
+        try:
+            user = SmUserMember(ID=cls.md5_generator('sm_user_member' + str(para['CreateTime'])), **para)
+            session.add(user)
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            raise e
+
+    @classmethod
     def insert(cls, token_data, **para):
         date_time_now = datetime.datetime.now()     # 获取当前时间
         para['Password'] = cls.sha256_generator(para['Password'])     # 修正密码
