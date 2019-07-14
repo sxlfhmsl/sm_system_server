@@ -6,7 +6,7 @@ from flask.blueprints import Blueprint
 from flask import request, jsonify, abort
 
 from .utils import BaseView, PermissionView
-from .sta_code import SUCCESS, ERROR_USER_LOGIN, ERROR_BASE
+from .sta_code import SUCCESS, USER_NAME_PASS_WRONG_ERROR, USER_FORBIDDEN_ERROR, USER_LOCK_ERROR, OTHER_ERROR
 from ..service.user_service import SmUserService
 from ..service.user_admin_service import SmUserAdminService
 from ..service.user_agent_service import SmUserAgentService
@@ -21,13 +21,17 @@ class UserLoginView(BaseView):
     """
 
     def dispatch_request(self):
-        token = SmUserService.login(request.json['LoginName'], request.json['Password'])
-        if len(token) == 64:
-            success = SUCCESS()
-            success['data'] = {'token': token}
-            return jsonify(success)
-        else:
-            return jsonify(ERROR_USER_LOGIN[token])
+        code, token = SmUserService.login(request.json['LoginName'], request.json['Password'])
+        if code == 0:                                        # 登录成功
+            return jsonify(SUCCESS({'auth': token}))
+        elif code == 1:                                      # 账户或者密码错误
+            return jsonify(USER_NAME_PASS_WRONG_ERROR)
+        elif code == 2:                                      # 用户被禁用
+            return jsonify(USER_FORBIDDEN_ERROR)
+        elif code == 3:                                      # 用户被锁定
+            return jsonify(USER_LOCK_ERROR)
+        elif code == 4:                                      # 其他错误
+            return jsonify(OTHER_ERROR)
 
 
 class UserInfoView(PermissionView):
