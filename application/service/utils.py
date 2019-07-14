@@ -6,7 +6,7 @@
 from datetime import datetime
 from hashlib import md5, sha256
 
-from ..dao.models import db, SmUserLog
+from ..dao.models import db, SmUserLog, SmUserAdmin, SmUserAgent, SmUserMember
 
 
 class BaseService:
@@ -32,6 +32,26 @@ class BaseService:
         except Exception as e:
             db.session.rollback()
             raise e
+
+    @staticmethod
+    def is_forbidden(user_id, user_type):
+        """
+        验证用户是否被禁用
+        :param user_id: 用户id
+        :param user_type: 用户类型， Admin, Agent, Member
+        :return: 未禁用返回用户model否则None
+        """
+        result = None
+        if user_type == 'Admin':
+            result = SmUserAdmin.query.filter(SmUserAdmin.ID == user_id).first()
+        elif user_type == 'Agent':
+            result = SmUserAgent.query.filter(SmUserAgent.ID == user_id).first()
+        elif user_type == 'Member':
+            result = SmUserMember.query.filter(SmUserMember.ID == user_id).first()
+        if result and result.Forbidden != 0 and result.ID != '1':
+            return None
+        return result
+
 
     @staticmethod
     def md5_generator(content: str):

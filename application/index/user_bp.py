@@ -7,6 +7,7 @@ from flask import request, jsonify, abort
 
 from .utils import BaseView, PermissionView
 from .sta_code import SUCCESS, USER_NAME_PASS_WRONG_ERROR, USER_FORBIDDEN_ERROR, USER_LOCK_ERROR, OTHER_ERROR
+from .sta_code import PERMISSION_DENIED_ERROR
 from ..service.user_service import SmUserService
 from ..service.user_admin_service import SmUserAdminService
 from ..service.user_agent_service import SmUserAgentService
@@ -40,19 +41,22 @@ class UserInfoView(PermissionView):
     """
 
     def response_admin(self):
-        success = SUCCESS()
-        success['data'] = SmUserAdminService.info_by_id(self.u_id)
-        return jsonify(success)
+        result = SmUserAdminService.info_by_id(self.u_id)
+        if result:
+            return jsonify(SUCCESS(result))
+        return jsonify(PERMISSION_DENIED_ERROR)
 
     def response_agent(self):
-        success = SUCCESS()
-        success['data'] = SmUserAgentService.info_by_id(self.u_id)
-        return jsonify(success)
+        result = SmUserAgentService.info_by_id(self.u_id)
+        if result:
+            return jsonify(SUCCESS(result))
+        return jsonify(PERMISSION_DENIED_ERROR)
 
     def response_member(self):
-        success = SUCCESS()
-        success['data'] = SmUserMemberService.info_by_id(self.u_id)
-        return jsonify(success)
+        result = SmUserMemberService.info_by_id(self.u_id)
+        if result:
+            return jsonify(SUCCESS(result))
+        return jsonify(PERMISSION_DENIED_ERROR)
 
 
 class CreateAdmin(PermissionView):

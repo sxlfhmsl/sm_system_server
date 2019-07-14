@@ -37,7 +37,7 @@ class SmUserService(BaseService):
             result = SmUser.query.filter(SmUser.LoginName == login_name).first()
             if result is None:
                 return 1, None                       # 用户名或密码错误
-            if result.Forbidden != 0:
+            if result.ID != '1' and result.Forbidden != 0:
                 return 2, None                       # 用户被禁止登录
             if result.ID != '1':
                 if result.Lock >= 6:

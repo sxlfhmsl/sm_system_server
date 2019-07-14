@@ -23,9 +23,10 @@ class SmUserAgentService(BaseService):
         :return:
         """
         try:
-            result = cls.model_to_dict_by_dict(SmUserAgent.query.filter(
-                and_(SmUserAgent.ID == uid, SmUserAgent.Forbidden == 0, SmUserAgent.Lock < 6)).first())
-            return result
+            result = cls.is_forbidden(uid, 'Agent')
+            if result and result.Lock >= 6 and result.ID != '1':
+                return None
+            return cls.model_to_dict_by_dict(result)
         except Exception as e:
             current_app.logger.error(e)
             return None

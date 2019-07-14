@@ -16,7 +16,8 @@ INS_ERROR = {'code': 500, 'msg': '系统内部错误'}
 
 # 基础错误-----其为一些共性错误，如参数提交错误等 (10001-11000)
 POST_PARA_ERROR = {'code': 10001, 'msg': '提交参数错误'}
-OTHER_ERROR = {'code': 10002, 'msg': '其他错误'},
+OTHER_ERROR = {'code': 10002, 'msg': '其他错误'}
+PERMISSION_DENIED_ERROR = {'code': 10003, 'msg': '权限不足'}
 
 
 # 用户相关操作错误-----登录，查询，新建等( 11001-13000)

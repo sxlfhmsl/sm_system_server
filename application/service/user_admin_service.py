@@ -4,7 +4,6 @@
 """
 import datetime
 from flask import current_app
-from sqlalchemy import and_
 
 from ..dao.models import db, SmUser, SmUserAdmin, SmUserRole, SmUserLog
 from .utils import BaseService
@@ -23,9 +22,10 @@ class SmUserAdminService(BaseService):
         :return:
         """
         try:
-            result = cls.model_to_dict_by_dict(SmUserAdmin.query.filter(
-                and_(SmUserAdmin.ID == uid, SmUserAdmin.Forbidden == 0, SmUserAdmin.Lock < 6)).first())
-            return result
+            result = cls.is_forbidden(uid, 'Admin')
+            if result and result.Lock >= 6 and result.ID != '1':
+                return None
+            return cls.model_to_dict_by_dict(result)
         except Exception as e:
             current_app.logger.error(e)
             return None

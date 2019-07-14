@@ -23,12 +23,10 @@ class SmUserMemberService(BaseService):
         :return:
         """
         try:
-            mid = SmUserMember.query.filter(
-                and_(SmUserMember.ID == uid, SmUserMember.Forbidden == 0, SmUserMember.Lock < 6)).first()
-            result = cls.model_to_dict_by_dict(mid)
-            result['AgentName'] = mid.sm_user_agent.LoginName
-            result['ClerkName'] = mid.sm_user_agent.NickName
-            return result
+            result = cls.is_forbidden(uid, 'Member')
+            if result and result.Lock >= 6 and result.ID != '1':
+                return None
+            return cls.model_to_dict_by_dict(result)
         except Exception as e:
             current_app.logger.error(e)
             return None
