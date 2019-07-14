@@ -27,13 +27,14 @@ class BaseService:
         :param note: 记录值
         :return: None
         """
+        session = db.session
         try:
             log = SmUserLog(ID=BaseService.md5_generator('sm_user_log' + str(time)), UserID=user_id, Type=user_type,
                             Time=time, Model=model, Note=note)
-            db.session.add(log)
-            db.session.commit()
+            session.add(log)
+            session.commit()
         except Exception as e:
-            db.session.rollback()
+            session.rollback()
             raise e
 
     @staticmethod
@@ -82,14 +83,14 @@ class BaseService:
         """
         if name == 'Admin':
             if not cls.AdminRole:
-                cls.AdminRole = SmUserRole.query.filter(SmUserRole.Name == 'Admin').first()
+                cls.AdminRole = cls.model_to_dict_by_dict(SmUserRole.query.filter(SmUserRole.Name == 'Admin').first())
             return cls.AdminRole
         elif name == 'Agent':
             if not cls.AgentRole:
-                cls.AgentRole = SmUserRole.query.filter(SmUserRole.Name == 'Agent').first()
+                cls.AgentRole = cls.model_to_dict_by_dict(SmUserRole.query.filter(SmUserRole.Name == 'Agent').first())
             return cls.AgentRole
         elif name == 'Member':
             if not cls.MemberRole:
-                cls.MemberRole = SmUserRole.query.filter(SmUserRole.Name == 'Member').first()
+                cls.MemberRole = cls.model_to_dict_by_dict(SmUserRole.query.filter(SmUserRole.Name == 'Member').first())
             return cls.MemberRole
 

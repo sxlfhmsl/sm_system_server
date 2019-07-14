@@ -5,7 +5,7 @@
 import datetime
 from flask import current_app
 
-from ..dao.models import db, SmUser, SmUserAdmin, SmUserRole, SmUserLog
+from ..dao.models import db, SmUser, SmUserAdmin
 from .utils import BaseService
 
 
@@ -34,12 +34,13 @@ class SmUserAdminService(BaseService):
         :param para: 参数
         :return: None
         """
+        session = db.session
         try:
-            user = SmUserAdmin(ID=cls.md5_generator('sm_admin_user' + str(para['CreateTime'])), **para)
-            db.session.add(user)
-            db.session.commit()
+            user = SmUserAdmin(ID=cls.md5_generator('sm_user_admin' + str(para['CreateTime'])), **para)
+            session.add(user)
+            session.commit()
         except Exception as e:
-            db.session.rollback()
+            session.rollback()
             raise e
 
     @classmethod
@@ -59,8 +60,8 @@ class SmUserAdminService(BaseService):
             if user:     # 存在相同的用户名
                 return 1
             role = cls.get_role('Admin')     # 获取管理员权限
-            cls.add_admin_to_db(CreateTime=date_time_now, RoleID=role.ID, Forbidden=0, Lock=0, **para)
-            cls.create_log(para['CreatorID'], role.Description, '创建管理员', date_time_now, role.Description + '创建管理员')
+            cls.add_admin_to_db(CreateTime=date_time_now, RoleID=role['ID'], Forbidden=0, Lock=0, **para)
+            cls.create_log(para['CreatorID'], role['Description'], '创建管理员', date_time_now, role['Description'] + '创建管理员')
         except Exception as e:
             current_app.logger.error(e)
             return 2

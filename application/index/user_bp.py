@@ -3,11 +3,11 @@
 用户登录接口
 """
 from flask.blueprints import Blueprint
-from flask import request, jsonify, abort
+from flask import request, jsonify, abort, current_app
 
 from .utils import BaseView, PermissionView
 from .sta_code import SUCCESS, USER_NAME_PASS_WRONG_ERROR, USER_FORBIDDEN_ERROR, USER_LOCK_ERROR, OTHER_ERROR
-from .sta_code import PERMISSION_DENIED_ERROR, USER_SAME_LOGIN_NAME, POST_PARA_ERROR
+from .sta_code import PERMISSION_DENIED_ERROR, USER_SAME_LOGIN_NAME, POST_PARA_ERROR, USER_AGENT_LEVEL_LOW
 from ..service.user_service import SmUserService
 from ..service.user_admin_service import SmUserAdminService
 from ..service.user_agent_service import SmUserAgentService
@@ -73,7 +73,8 @@ class CreateAdmin(PermissionView):
                 return jsonify(USER_SAME_LOGIN_NAME)
             elif result == 2:
                 return jsonify(OTHER_ERROR)
-        except:    # 参数解析错误
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
             return jsonify(POST_PARA_ERROR)
         return jsonify(OTHER_ERROR)
 
@@ -90,25 +91,33 @@ class CreateAgent(PermissionView):
     """
     def response_admin(self):
         try:
-            result = SmUserAgentService.insert(self._token_data, **request.json)
+            result = SmUserAgentService.admin_create_agent(self.user, **request.json)
             if result == 0:                                                        # 添加成功
                 return jsonify(SUCCESS())
-            if result == 1:                                                        # 参数错误
-                return jsonify(ERROR_BASE['POST_PARA_ERROR'])
-        except Exception:
-            return jsonify(ERROR_BASE['POST_PARA_ERROR'])
+            elif result == 1:                                                      # 相同用户名
+                return jsonify(USER_SAME_LOGIN_NAME)
+            elif result == 2:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
 
     def response_agent(self):
         try:
-            result = SmUserAgentService.insert(self._token_data, **request.json)
+            result = SmUserAgentService.agent_create_agent(self.user, **request.json)
             if result == 0:                                                        # 添加成功
                 return jsonify(SUCCESS())
-            if result == 1:                                                        # 参数错误
-                return jsonify(ERROR_BASE['POST_PARA_ERROR'])
-            if result == 2:                                                        # 权限不足----最大4级代理
-                abort(404)
-        except Exception:
-            return jsonify(ERROR_BASE['POST_PARA_ERROR'])
+            elif result == 1:                                                      # 相同用户名
+                return jsonify(USER_SAME_LOGIN_NAME)
+            elif result == 2:                                                      # 代理等级过低
+                return jsonify(USER_AGENT_LEVEL_LOW)
+            elif result == 3:                                                      # 其他错误
+                return jsonify(OTHER_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
 
     def response_member(self):
         abort(404)

@@ -72,7 +72,6 @@ def sig_model_to_dict(model, *columns):
     for col in columns:
         if isinstance(col.type, DateTime):
             value = convert_datetime(getattr(model, col.name))
-            print(value)
         elif isinstance(col.type, Numeric):
             value = float(getattr(model, col.name))
         else:

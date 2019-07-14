@@ -29,48 +29,71 @@ class SmUserAgentService(BaseService):
             return None
 
     @classmethod
-    def insert(cls, token_data, **para):
+    def add_agent_to_db(cls, **para):
+        """
+        插入代理到数据库
+        :param para: 参数
+        :return:
+        """
+        session = db.session
+        try:
+            user = SmUserAgent(ID=cls.md5_generator('sm_user_agent' + str(para['CreateTime'])), **para)
+            session.add(user)
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            raise e
+
+    @classmethod
+    def admin_create_agent(cls, admin_user, **para):
+        """
+        管理员创建代理用户
+        :param admin_user: 管理员用户Model
+        :param para: 相关参数
+        :return: 返回结果            阐述
+                 0                   代理创建成功
+                 1                   存在相同的用户名
+                 2                   其他错误
+        """
         date_time_now = datetime.datetime.now()
         para['Password'] = cls.sha256_generator(para['Password'])
+        role = cls.get_role('Agent')
         try:
-            # 确定用户名是否存在
             user = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
-            if user:
+            if user:    # 存在相同登录名用户
                 return 1
-            agent = None                                                                       # 待创建代理
-            log = None                                                                         # 日志
-            # 获取role-----agent
-            role = SmUserRole.query.filter(SmUserRole.Name == 'Agent').first()
-            if token_data['u_role_name'] == 'Admin':
-                # 获取创建者
-                creator = SmUserAdmin.query.filter(SmUserAdmin.ID == token_data['u_id']).first()
-                agent = SmUserAgent(
-                    ID=cls.md5_generator('sm_user_agent' + str(date_time_now)), CreatorID=token_data['u_id'],
-                    AgentLevel=1, CreateTime=date_time_now, RoleID=role.ID, Forbidden=0, Lock=0, **para)
-                log = SmUserLog(
-                    ID=cls.md5_generator('sm_user_log' + str(date_time_now)), UserID=token_data['u_id'],
-                    Type=role.Description, Model='创建代理', Time=date_time_now,
-                    Note='管理员' + creator.LoginName + '创建代理' + para['LoginName']
-                )
-            elif token_data['u_role_name'] == 'Agent':
-                # 获取创建者
-                creator = SmUserAgent.query.filter(SmUserAgent.ID == token_data['u_id']).first()
-                if creator.AgentLevel >= 4:
-                    # 创建者等级过低
-                    return 2
-                agent = SmUserAgent(
-                    ID=cls.md5_generator('sm_user_agent' + str(date_time_now)), CreatorID=token_data['u_id'], Lock=0,
-                    AgentLevel=creator.AgentLevel + 1, CreateTime=date_time_now, RoleID=role.ID, Forbidden=0, **para)
-                log = SmUserLog(
-                    ID=cls.md5_generator('sm_user_log' + str(date_time_now)), UserID=token_data['u_id'], Model='创建代理',
-                    Type=role.Description,Time=date_time_now, Note='管理员' + creator.LoginName + '创建代理' + para['LoginName']
-                )
-            db.session.add(agent)
-            db.session.add(log)
-            db.session.commit()
+            cls.add_agent_to_db(CreatorID=admin_user.ID, AgentLevel=1, CreateTime=date_time_now, RoleID=role['ID'], Forbidden=0, Lock=0, **para)
+            cls.create_log(admin_user.ID, role['Description'], '创建代理', date_time_now, '管理员' + admin_user.LoginName + '创建代理' + para['LoginName'])
         except Exception as e:
-            db.session.rollback()
             current_app.logger.error(e)
-            return 1
+            return 2
+        return 0
+
+    @classmethod
+    def agent_create_agent(cls, agent_user, **para):
+        """
+        代理员创建代理用户
+        :param agent_user: 代理用户Model
+        :param para: 相关参数
+        :return: 返回结果            阐述
+                 0                   代理创建成功
+                 1                   存在相同的用户名
+                 2                   代理的等级过低
+                 3                   其他错误
+        """
+        date_time_now = datetime.datetime.now()
+        para['Password'] = cls.sha256_generator(para['Password'])
+        role = cls.get_role('Agent')
+        try:
+            user = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
+            if user:    # 存在相同登录名用户
+                return 1
+            if agent_user.AgentLevel >= 4:    # 不允许低于4级的用户
+                return 2
+            cls.add_agent_to_db(CreatorID=agent_user.ID, AgentLevel=agent_user.AgentLevel + 1, CreateTime=date_time_now, RoleID=role['ID'], Forbidden=0, Lock=0, **para)
+            cls.create_log(agent_user.ID, role['Description'], '创建代理', date_time_now, '代理' + agent_user.LoginName + '创建次级代理' + para['LoginName'])
+        except Exception as e:
+            current_app.logger.error(e)
+            return 3
         return 0
 
