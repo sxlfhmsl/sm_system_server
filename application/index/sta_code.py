@@ -10,16 +10,21 @@ def SUCCESS():
 
 
 # 系统错误
-ERROR_URL_NOTFOUND = {'code': 404, 'msg': '请求不存在'}
-ERROR_IN = {'code': 500, 'msg': '请检查提交参数'}
+ERROR_SYSTEM = {
+    'NOTFOUND_ERROR': {'code': 404, 'msg': '请求不存在'},
+    'INS_ERROR': {'code': 500, 'msg': '系统内部错误'}
+}
+
+# 基础错误-----提交参数不匹配等
+ERROR_BASE = {
+    'POST_PARA_ERROR': {'code': 10100, 'msg': '提交参数错误'}
+}
 
 # 用户登录失败
-ERROR_USER_LOGIN = [
-    {'code': 10001, 'msg': '用户名或密码错误'},
-    {'code': 10002, 'msg': '用户被禁用'},
-    {'code': 10003, 'msg': '账户被锁定'}
-]
-
-# 提交参数错误
-POST_PARA_ERROR = {'code': 10100, 'msg': '提交参数错误'}
+ERROR_USER_LOGIN = {
+    'PARA_ERROR': {'code': 10201, 'msg': '用户名或密码错误'},
+    'FORBIDDEN_ERROR': {'code': 10202, 'msg': '用户被禁用'},
+    'LOCK_ERROR': {'code': 10203, 'msg': '账户被锁定'},
+    'OP_ERROR': {'code': 10204, 'msg': '操作非法'},
+}
 

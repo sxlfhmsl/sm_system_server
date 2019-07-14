@@ -46,8 +46,11 @@ class PermissionView(BaseView):
 
     def __init__(self):
         self._token_data = None
-        self._uid = None
-        self._u_type = None
+        self.u_id = None
+        self.u_login_name = None
+        self.u_nick_name = None
+        self.u_role_id = None
+        self.u_role_name = None
 
     def response_admin(self):
         raise NotImplementedError
@@ -60,13 +63,15 @@ class PermissionView(BaseView):
 
     def dispatch_request(self, token_dict: dict):
         self._token_data = token_dict['data']
-        self._uid = self._token_data['uid']
-        self._u_type = self._token_data['utype']
-        self._u_type_id = self._token_data['utypeid']
-        if self._u_type == 'Admin':
+        self.u_id = self._token_data['u_id']
+        self.u_login_name = self._token_data['u_login_name']
+        self.u_nick_name = self._token_data['u_nick_name']
+        self.u_role_id = self._token_data['u_role_id']
+        self.u_role_name = self._token_data['u_role_name']
+        if self.u_role_name == 'Admin':
             return self.response_admin()
-        elif self._u_type == 'Agent':
+        elif self.u_role_name == 'Agent':
             return self.response_agent()
-        elif self._u_type == 'Member':
+        elif self.u_role_name == 'Member':
             return self.response_member()
 

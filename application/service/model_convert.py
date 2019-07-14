@@ -6,7 +6,6 @@ from collections import Iterable
 from datetime import datetime as cdatetime     # 有时候会返回datatime类型
 from datetime import date, time
 from flask_sqlalchemy import Model
-from sqlalchemy.orm.query import Query
 from sqlalchemy import DateTime, Numeric, Date, Time    # 有时又是DateTime
 
 
