@@ -86,6 +86,30 @@ class CreateAdmin(PermissionView):
         abort(404)
 
 
+class QueryAllAdmin(PermissionView):
+    """
+    查询所有的管理员
+    """
+
+    def response_admin(self):
+        try:
+            code, data = SmUserAdminService.query_admin(**request.json)
+            if code == 0:
+                return jsonify(SUCCESS(data))
+            elif code == 1:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
+
+    def response_agent(self):
+        abort(404)
+
+    def response_member(self):
+        abort(404)
+
+
 class CreateAgent(PermissionView):
     """
     创建代理
@@ -168,6 +192,7 @@ class CreateMember(PermissionView):
 user_bp.add_url_rule('/login', methods=['POST'], view_func=UserLoginView.as_view('user_login'))
 user_bp.add_url_rule('/info', methods=['POST'], view_func=UserInfoView.as_view('user_info'))
 user_bp.add_url_rule('/create_admin', methods=['POST'], view_func=CreateAdmin.as_view('create_admin'))
+user_bp.add_url_rule('/query_admins', methods=['POST'], view_func=QueryAllAdmin.as_view('query_admins'))
 user_bp.add_url_rule('/create_agent', methods=['POST'], view_func=CreateAgent.as_view('create_agent'))
 user_bp.add_url_rule('/create_member', methods=['POST'], view_func=CreateMember.as_view('create_member'))
 

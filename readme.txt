@@ -18,3 +18,6 @@ Navicat\Premium\profiles
 
 5.生成Model
 flask-sqlacodegen mysql+pymysql://root:admin123@127.0.0.1:3306/sm_system  --outfile application/dao/models.py --flask
+
+6.分页教程
+https://wxnacy.com/2018/03/27/sqlalchemy-paginate/

@@ -4,6 +4,7 @@
 """
 import datetime
 from flask import current_app
+from sqlalchemy import func
 
 from ..dao.models import db, SmUser, SmUserAdmin
 from .utils import BaseService
@@ -66,4 +67,25 @@ class SmUserAdminService(BaseService):
             current_app.logger.error(e)
             return 2
         return 0
+
+    @classmethod
+    def query_admin(cls, Page=None, PageSize=None):
+        """
+        查询所有管理员，按照分页，因无搜索关键字，故不作匹配，同时不查询管理员创建者的名字
+        :param Page: 第几页
+        :param PageSize: 每页的数量
+        :return: 代码    返回结果            阐述
+                 0       分页查询结果        登陆成功{total, rows}
+                 1       None                其他错误
+        """
+        if Page is None or PageSize is None:
+            Page = 1
+            PageSize = 1000
+        try:
+            page_result = SmUserAdmin.query.filter().paginate(Page, PageSize)     # 返回分页结果  items当前页结果 total数量
+            return 0, {"total": page_result.total, "rows": cls.model_to_dict_by_dict(page_result.items)}
+        except Exception as e:
+            current_app.logger.error(e)
+            return 1, None
+
 
