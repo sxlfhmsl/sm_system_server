@@ -14,7 +14,7 @@ class FlaskConfig:
 
     # flask_sqlalchemy配置
     # mysql连接信息
-    SQLALCHEMY_DATABASE_URI = "mysql://root:admin123@127.0.0.1:3306/sm_system?charset=utf8"
+    SQLALCHEMY_DATABASE_URI = "mysql://root:admin123@www.sl-db.com:3306/sm_system?charset=utf8"
     # 动态追踪修改设置，如未设置只会提示警告
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # 查询时会显示原始SQL语句
