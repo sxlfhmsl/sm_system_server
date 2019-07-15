@@ -68,3 +68,16 @@ class SmUserMemberService(BaseService):
             return 2
         return 0
 
+    @classmethod
+    def agent_create_member(cls, agent_user, **para):
+        """
+        代理创建会员
+        :param agent_user: 代理，Model
+        :param para: 相关参数
+        :return: 返回结果            阐述
+                 0                   会员创建成功
+                 1                   存在相同的用户名
+                 2                   其他错误
+        """
+        pass
+
