@@ -4,7 +4,6 @@
 """
 import datetime
 from flask import current_app
-from sqlalchemy import and_
 
 from ..dao.models import db, SmUserAgent, SmUserMember, SmUser, SmUserRole, SmClerk, SmUserLog
 from .utils import BaseService
@@ -45,35 +44,27 @@ class SmUserMemberService(BaseService):
             raise e
 
     @classmethod
-    def insert(cls, token_data, **para):
+    def admin_create_member(cls, admin_user, **para):
+        """
+        管理员创建会员
+        :param admin_user: 管理员，Model
+        :param para: 相关参数
+        :return: 返回结果            阐述
+                 0                   会员创建成功
+                 1                   存在相同的用户名
+                 2                   其他错误
+        """
         date_time_now = datetime.datetime.now()     # 获取当前时间
         para['Password'] = cls.sha256_generator(para['Password'])     # 修正密码
+        role = cls.get_role('Member')
         try:
             user = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
-            if user:     # 用户登录名已存在
+            if user:    # 存在相同登录名用户
                 return 1
-            member = None     # 待添加会员账号
-            log = None     # 待添加日志
-            role = SmUserRole.query.filter(SmUserRole.Name == 'Member').first()     # 获取role-----Member
-            if token_data['u_role_name'] == 'Admin':     # 管理员创建
-                agent = SmUserAgent.query.filter(SmUserAgent.ID == para['AgentID']).first()     # 获取待创建会员的代理
-                if agent is None:     # 检测不到所需代理
-                    return 1
-                if para.get('ClerkID', None):     # 校验ClerkID 业务员ID
-                    clerk = SmClerk.query.filter(SmClerk.ID == para['ClerkID'], SmClerk.AgentID == agent.ID).first()
-                    para['ClerkID'] = None if clerk is None else clerk.ID
-                # 生成所需会员对象
-                member = SmUserMember(ID=cls.md5_generator('sm_user_member' + str(date_time_now)), Forbidden=0, Lock=0,
-                                      CreatorID=token_data['u_id'], CreateTime=date_time_now, RoleID=role.ID, **para)
-                log = SmUserLog(ID=cls.md5_generator('sm_user_log' + str(date_time_now)), UserID=token_data['u_id'],
-                                Type=role.Description, Model='创建会员', Time=date_time_now,
-                                Note='管理员 ' + token_data['u_login_name'] + '创建会员 ' + para['LoginName'])
-            db.session.add(member)
-            db.session.add(log)
-            db.session.commit()
+            cls.add_member_to_db(CreatorID=admin_user.ID, Forbidden=0, Lock=0, CreateTime=date_time_now, RoleID=role['ID'], **para)
+            cls.create_log(admin_user.ID, role['Description'], '创建会员', date_time_now, '管理员' + admin_user.LoginName + '创建会员' + para['LoginName'])
         except Exception as e:
-            db.session.rollback()
             current_app.logger.error(e)
-            return 1
+            return 2
         return 0
 

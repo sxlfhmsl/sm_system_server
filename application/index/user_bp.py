@@ -130,13 +130,17 @@ class CreateMember(PermissionView):
 
     def response_admin(self):
         try:
-            result = SmUserMemberService.insert(self._token_data, **request.json)
+            result = SmUserMemberService.admin_create_member(self.user, **request.json)
             if result == 0:                                                        # 添加成功
                 return jsonify(SUCCESS())
-            if result == 1:                                                        # 参数错误
-                return jsonify(ERROR_BASE['POST_PARA_ERROR'])
-        except Exception:
-            return jsonify(ERROR_BASE['POST_PARA_ERROR'])
+            if result == 1:                                                        # 相同登录名
+                return jsonify(USER_SAME_LOGIN_NAME)
+            elif result == 2:                                                      # 其他错误
+                return jsonify(OTHER_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
 
     def response_agent(self):
         abort(404)

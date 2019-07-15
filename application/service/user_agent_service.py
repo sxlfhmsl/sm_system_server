@@ -4,9 +4,8 @@
 """
 import datetime
 from flask import current_app
-from sqlalchemy import and_
 
-from ..dao.models import db, SmUser, SmUserAdmin, SmUserAgent, SmUserRole, SmUserLog
+from ..dao.models import db, SmUser, SmUserAgent
 from .utils import BaseService
 
 
