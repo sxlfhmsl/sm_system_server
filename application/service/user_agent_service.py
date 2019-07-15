@@ -61,7 +61,7 @@ class SmUserAgentService(BaseService):
             user = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
             if user:    # 存在相同登录名用户
                 return 1
-            cls.add_agent_to_db(CreatorID=admin_user.ID, AgentLevel=1, CreateTime=date_time_now, RoleID=role['ID'], Forbidden=0, Lock=0, **para)
+            cls.add_agent_to_db(CreatorID=admin_user.ID, MemberNum=0, AgentLevel=1, CreateTime=date_time_now, RoleID=role['ID'], Forbidden=0, Lock=0, **para)
             cls.create_log(admin_user.ID, role['Description'], '创建代理', date_time_now, '管理员' + admin_user.LoginName + '创建代理' + para['LoginName'])
         except Exception as e:
             current_app.logger.error(e)
@@ -90,7 +90,7 @@ class SmUserAgentService(BaseService):
                 return 1
             if agent_user.AgentLevel >= 4:    # 不允许低于4级的用户
                 return 2
-            cls.add_agent_to_db(CreatorID=agent_user.ID, AgentLevel=agent_user.AgentLevel + 1, CreateTime=date_time_now, RoleID=role['ID'], Forbidden=0, Lock=0, **para)
+            cls.add_agent_to_db(CreatorID=agent_user.ID, MemberNum=0, AgentLevel=agent_user.AgentLevel + 1, CreateTime=date_time_now, RoleID=role['ID'], Forbidden=0, Lock=0, **para)
             cls.create_log(agent_user.ID, role['Description'], '创建代理', date_time_now, '代理' + agent_user.LoginName + '创建次级代理' + para['LoginName'])
         except Exception as e:
             current_app.logger.error(e)

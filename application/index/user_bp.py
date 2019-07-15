@@ -8,6 +8,7 @@ from flask import request, jsonify, abort, current_app
 from .utils import BaseView, PermissionView
 from .sta_code import SUCCESS, USER_NAME_PASS_WRONG_ERROR, USER_FORBIDDEN_ERROR, USER_LOCK_ERROR, OTHER_ERROR
 from .sta_code import PERMISSION_DENIED_ERROR, USER_SAME_LOGIN_NAME, POST_PARA_ERROR, USER_AGENT_LEVEL_LOW
+from .sta_code import USER_AGENT_NOT_ENOUGH_MEMBER
 from ..service.user_service import SmUserService
 from ..service.user_admin_service import SmUserAdminService
 from ..service.user_agent_service import SmUserAgentService
@@ -137,13 +138,28 @@ class CreateMember(PermissionView):
                 return jsonify(USER_SAME_LOGIN_NAME)
             elif result == 2:                                                      # 其他错误
                 return jsonify(OTHER_ERROR)
+            elif result == 3:
+                return jsonify(USER_AGENT_NOT_ENOUGH_MEMBER)
         except Exception as e:
             current_app.logger.error(e)
             return jsonify(POST_PARA_ERROR)
         return jsonify(OTHER_ERROR)
 
     def response_agent(self):
-        abort(404)
+        try:
+            result = SmUserMemberService.agent_create_member(self.user, **request.json)
+            if result == 0:                                                        # 添加成功
+                return jsonify(SUCCESS())
+            if result == 1:                                                        # 相同登录名
+                return jsonify(USER_SAME_LOGIN_NAME)
+            elif result == 2:                                                      # 成员不足
+                return jsonify(USER_AGENT_NOT_ENOUGH_MEMBER)
+            elif result == 3:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
 
     def response_member(self):
         abort(404)

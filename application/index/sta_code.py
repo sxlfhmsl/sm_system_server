@@ -33,4 +33,5 @@ USER_LOCK_ERROR = {'code': 11003, 'msg': '账户被锁定'}
 #     用户操作错误
 USER_SAME_LOGIN_NAME = {'code': 11004, 'msg': '登录名已存在，请使用新的登录名'}
 USER_AGENT_LEVEL_LOW = {'code': 11005, 'msg': '代理等级过低，无法完成操作'}
+USER_AGENT_NOT_ENOUGH_MEMBER = {'code': 11006, 'msg': '代理可创建会员数量不足'}
 
