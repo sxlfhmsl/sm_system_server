@@ -47,6 +47,7 @@ class SmUserMemberService(BaseService):
     def admin_create_member(cls, admin_user, **para):
         """
         管理员创建会员
+        暂时不对代理允许创建的会员数量做出限制，后期进行限制
         :param admin_user: 管理员，Model
         :param para: 相关参数
         :return: 返回结果            阐述
@@ -72,6 +73,7 @@ class SmUserMemberService(BaseService):
     def agent_create_member(cls, agent_user, **para):
         """
         代理创建会员
+        暂时不对代理允许创建的会员数量做出限制，后期进行限制
         :param agent_user: 代理，Model
         :param para: 相关参数
         :return: 返回结果            阐述

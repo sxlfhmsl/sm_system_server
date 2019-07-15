@@ -71,7 +71,8 @@ class SmUserAgentService(BaseService):
     @classmethod
     def agent_create_agent(cls, agent_user, **para):
         """
-        代理员创建代理用户
+        代理员创建代理用户, 暂时不加数量限制，后期加上，MemberMaximum和MemberNum
+        父级代理创建子级代理时，子级代理的MemberMaximum会累加到父级的MemberNum，直至等于MemberMaximum
         :param agent_user: 代理用户Model
         :param para: 相关参数
         :return: 返回结果            阐述
