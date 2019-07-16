@@ -70,10 +70,19 @@ def reg_blueprint(app):
     :return: None
     """
     from .index.user_bp import user_bp
+    from .index.user_admin_bp import user_admin_bp
+    from .index.user_agent_bp import user_agent_bp
+    from .index.user_member_bp import user_member_bp
     from .index.exception_bp import exception_bp
 
     # 用户相关蓝图接口
     app.register_blueprint(user_bp, url_prefix='/user')
+    # 管理员相关接口
+    app.register_blueprint(user_admin_bp, url_prefix='/user/admin')
+    # 代理相关接口
+    app.register_blueprint(user_agent_bp, url_prefix='/user/agent')
+    # 会员相关接口
+    app.register_blueprint(user_member_bp, url_prefix='/user/member')
     # 异常拦截
     app.register_blueprint(exception_bp, url_prefix='/exception')
 

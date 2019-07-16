@@ -410,7 +410,7 @@ CREATE TABLE `sm_user_member` (
   `BankAccount` varchar(30) DEFAULT NULL COMMENT '银行账户',
   `Cardholder` varchar(30) DEFAULT NULL COMMENT '银行账户名',
   `OpeningBank` varchar(30) DEFAULT NULL COMMENT '开户行',
-  `WithdrawPassWord` varchar(30) DEFAULT NULL COMMENT '取款密码',
+  `WithdrawPassWord` varchar(64) DEFAULT NULL COMMENT '取款密码',
   `EmailAddress` varchar(50) DEFAULT NULL COMMENT '邮箱地址',
   `QQNum` varchar(20) DEFAULT NULL COMMENT 'QQ号',
   `Type` int(11) DEFAULT NULL COMMENT '账户类型，正式，测试，其他',
