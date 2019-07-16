@@ -257,7 +257,7 @@ class SmUserMember(SmUser):
     BankAccount = db.Column(db.String(30))
     Cardholder = db.Column(db.String(30))
     OpeningBank = db.Column(db.String(30))
-    WithdrawPassWord = db.Column(db.String(30))
+    WithdrawPassWord = db.Column(db.String(64))
     EmailAddress = db.Column(db.String(50))
     QQNum = db.Column(db.String(20))
     Type = db.Column(db.Integer)

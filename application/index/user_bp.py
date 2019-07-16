@@ -8,7 +8,7 @@ from flask import request, jsonify, abort, current_app
 from .utils import BaseView, PermissionView
 from .sta_code import SUCCESS, USER_NAME_PASS_WRONG_ERROR, USER_FORBIDDEN_ERROR, USER_LOCK_ERROR, OTHER_ERROR
 from .sta_code import PERMISSION_DENIED_ERROR, USER_SAME_LOGIN_NAME, POST_PARA_ERROR, USER_AGENT_LEVEL_LOW
-from .sta_code import USER_AGENT_NOT_ENOUGH_MEMBER
+from .sta_code import USER_AGENT_NOT_ENOUGH_MEMBER, USER_WRONG_PASS
 from ..service.user_service import SmUserService
 from ..service.user_admin_service import SmUserAdminService
 from ..service.user_agent_service import SmUserAgentService
@@ -61,22 +61,71 @@ class UserInfoView(PermissionView):
     """
 
     def response_admin(self):
-        result = SmUserAdminService.info_by_id(self.user)
+        result = SmUserAdminService.get_by_id(self.u_id)
         if result:
             return jsonify(SUCCESS(result))
         return jsonify(PERMISSION_DENIED_ERROR)
 
     def response_agent(self):
-        result = SmUserAgentService.info_by_id(self.user)
+        result = SmUserAgentService.get_by_id(self.u_id)
         if result:
             return jsonify(SUCCESS(result))
         return jsonify(PERMISSION_DENIED_ERROR)
 
     def response_member(self):
-        result = SmUserMemberService.info_by_id(self.user)
+        result = SmUserMemberService.get_by_id(self.u_id)
         if result:
             return jsonify(SUCCESS(result))
         return jsonify(PERMISSION_DENIED_ERROR)
+
+
+class UserChangePassView(PermissionView):
+    """
+    修改密码，Pass
+    """
+
+    def response_admin(self):
+        try:
+            result = SmUserService.change_login_pass(self.user, request.json.get('Old', None), request.json.get('New', None))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(USER_WRONG_PASS)
+            elif result == 2:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+
+    def response_agent(self):
+        try:
+            result = SmUserService.change_login_pass(self.user, request.json.get('Old', None), request.json.get('New', None))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(USER_WRONG_PASS)
+            elif result == 2:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+
+    def response_member(self):
+        try:
+            result = None
+            if request.json.get('Type', None) == 2:
+                result = SmUserMemberService.change_withdraw_pass(self.user, request.json.get('Old', None), request.json.get('New', None))
+            else:
+                result = SmUserService.change_login_pass(self.user, request.json.get('Old', None), request.json.get('New', None))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(USER_WRONG_PASS)
+            elif result == 2:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
 
 
 class CreateAdmin(PermissionView):
@@ -211,6 +260,7 @@ class CreateMember(PermissionView):
 user_bp.add_url_rule('/login', methods=['POST'], view_func=UserLoginView.as_view('user_login'))
 user_bp.add_url_rule('/logout', methods=['POST'], view_func=UserLogoutView.as_view('user_logout'))
 user_bp.add_url_rule('/info', methods=['POST'], view_func=UserInfoView.as_view('user_info'))
+user_bp.add_url_rule('/change_pass', methods=['POST'], view_func=UserChangePassView.as_view('user_change_pass'))
 user_bp.add_url_rule('/create_admin', methods=['POST'], view_func=CreateAdmin.as_view('create_admin'))
 user_bp.add_url_rule('/query_admins', methods=['POST'], view_func=QueryAllAdmin.as_view('query_admins'))
 user_bp.add_url_rule('/create_agent', methods=['POST'], view_func=CreateAgent.as_view('create_agent'))

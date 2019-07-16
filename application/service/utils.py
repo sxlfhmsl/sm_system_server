@@ -5,6 +5,7 @@
 
 from datetime import datetime
 from hashlib import md5, sha256
+from flask import current_app
 
 from ..dao.models import db, SmUserLog, SmUserAdmin, SmUserAgent, SmUserMember, SmUserRole
 
@@ -15,6 +16,7 @@ class BaseService:
     AdminRole = None
     AgentRole = None
     MemberRole = None
+    BaseModel = None
 
     @staticmethod
     def create_log(user_id: str, user_type: str, model: str, time: datetime, note: str):
@@ -93,4 +95,31 @@ class BaseService:
             if not cls.MemberRole:
                 cls.MemberRole = cls.model_to_dict_by_dict(SmUserRole.query.filter(SmUserRole.Name == 'Member').first())
             return cls.MemberRole
+
+    @classmethod
+    def get_by_id(cls, m_id):
+        """
+        通过id查询记录
+        :param m_id:
+        :return:
+        """
+        return cls.model_to_dict_by_dict(cls.BaseModel.query.filter(cls.BaseModel.ID == m_id).first())
+
+    @classmethod
+    def update_by_id(cls, m_id, **para):
+        """
+        通过id更新数据
+        :param m_id: 数据id
+        :param para: 参数
+        :return: 0: 成功， 1: 提交参数有误
+        """
+        session = db.session
+        try:
+            cls.BaseModel.query.filter(cls.BaseModel.ID == m_id).update(para)
+            session.commit()     # 提交记录
+        except Exception as e:
+            session.rollback()     # 回滚
+            current_app.logger.error(e)
+            return 1
+        return 0
 

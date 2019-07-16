@@ -13,19 +13,7 @@ class SmUserMemberService(BaseService):
     """
     代理业务逻辑代码
     """
-
-    @classmethod
-    def info_by_id(cls, user):
-        """
-        获取会员信息
-        :param user: 会员
-        :return:
-        """
-        try:
-            return cls.model_to_dict_by_dict(user)
-        except Exception as e:
-            current_app.logger.error(e)
-            return None
+    BaseModel = SmUserMember
 
     @classmethod
     def add_member_to_db(cls, agent_user, **para):
@@ -102,5 +90,25 @@ class SmUserMemberService(BaseService):
         except Exception as e:
             current_app.logger.error(e)
             return 3
+        return 0
+
+    @classmethod
+    def change_withdraw_pass(cls, user, old_pass, new_pass):
+        """"
+        修改登录密码
+        :param user: 目标用户
+        :param old_pass: 旧密码
+        :param new_pass: 新密码
+        :return: 执行结果    0: 执行成功， 1: 错误旧密码    2: 其他错误
+        """
+        try:
+            old_pass = cls.sha256_generator(old_pass)
+            if old_pass != user.WithdrawPassWord:
+                return 1
+            user.WithdrawPassWord = cls.sha256_generator(new_pass)
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.error(e)
+            return 2
         return 0
 

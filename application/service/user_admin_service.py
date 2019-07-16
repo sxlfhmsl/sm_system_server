@@ -13,19 +13,7 @@ class SmUserAdminService(BaseService):
     """
     管理员相关service
     """
-
-    @classmethod
-    def info_by_id(cls, user):
-        """
-        获取管理员相关信息
-        :param user: 管理员
-        :return: 成功返回对应字典对象，否者返回None
-        """
-        try:
-            return cls.model_to_dict_by_dict(user)
-        except Exception as e:
-            current_app.logger.error(e)
-            return None
+    BaseModel = SmUserAdmin
 
     @classmethod
     def add_admin_to_db(cls, **para):

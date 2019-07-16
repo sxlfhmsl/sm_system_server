@@ -15,6 +15,7 @@ class SmUserService(BaseService):
     """
     用户service
     """
+    BaseModel = SmUser
 
     @classmethod
     def login(cls, login_name, password):
@@ -74,4 +75,24 @@ class SmUserService(BaseService):
             user = SmUser.query.filter(SmUser.ID == user_id)
             user.LastLogonTime = datetime.datetime.now()
             db.session.commit()
+
+    @classmethod
+    def change_login_pass(cls, user, old_pass, new_pass):
+        """
+        修改登录密码
+        :param user: 目标用户
+        :param old_pass: 旧密码
+        :param new_pass: 新密码
+        :return: 执行结果    0: 执行成功， 1: 错误旧密码    2: 其他错误
+        """
+        try:
+            old_pass = cls.sha256_generator(old_pass)
+            if old_pass != user.Password:
+                return 1
+            user.Password = cls.sha256_generator(new_pass)
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.error(e)
+            return 2
+        return 0
 

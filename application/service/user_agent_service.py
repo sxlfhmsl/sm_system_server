@@ -13,19 +13,7 @@ class SmUserAgentService(BaseService):
     """
     代理 业务逻辑代码
     """
-
-    @classmethod
-    def info_by_id(cls, user):
-        """
-        获取代理用户信息
-        :param user: 代理
-        :return:
-        """
-        try:
-            return cls.model_to_dict_by_dict(user)
-        except Exception as e:
-            current_app.logger.error(e)
-            return None
+    BaseModel = SmUserAgent
 
     @classmethod
     def add_agent_to_db(cls, **para):
