@@ -48,6 +48,7 @@ class SmUserMemberService(BaseService):
         """
         date_time_now = datetime.datetime.now()     # 获取当前时间
         para['Password'] = cls.sha256_generator(para['Password'])     # 修正密码
+        para['WithdrawPassWord'] = cls.sha256_generator(para['WithdrawPassWord'])     # 修正提款密码
         role = cls.get_role('Member')
         try:
             user = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
@@ -78,6 +79,7 @@ class SmUserMemberService(BaseService):
         """
         date_time_now = datetime.datetime.now()     # 获取当前时间
         para['Password'] = cls.sha256_generator(para['Password'])     # 修正密码
+        para['WithdrawPassWord'] = cls.sha256_generator(para['WithdrawPassWord'])     # 修正提款密码
         role = cls.get_role('Member')
         try:
             user = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
