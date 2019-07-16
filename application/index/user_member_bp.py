@@ -55,5 +55,30 @@ class CreateMember(PermissionView):
         abort(404)
 
 
+class QueryAllMember(PermissionView):
+    """
+    查询所有的会员
+    """
+
+    def response_admin(self):
+        try:
+            code, data = SmUserMemberService.query_admin(**request.json)
+            if code == 0:
+                return jsonify(SUCCESS(data))
+            elif code == 1:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
+
+    def response_agent(self):
+        abort(404)
+
+    def response_member(self):
+        abort(404)
+
+
 user_member_bp.add_url_rule('/create', methods=['POST'], view_func=CreateMember.as_view('create_member'))
+user_agent_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllMember.as_view('all_member'))
 

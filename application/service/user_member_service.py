@@ -114,3 +114,17 @@ class SmUserMemberService(BaseService):
             return 2
         return 0
 
+    @classmethod
+    def query_member(cls, AgentID=None, LoginName=None, NickName=None, ClerkID=None, Page=None, PageSize=None):
+        """
+        查询所有符合条件的会员
+        :param AgentID: 所属代理ID，为空查询所有。
+        :param LoginName: 登录名模糊搜索
+        :param NickName: 客户姓名模糊搜索
+        :param ClerkID: 代理端查询（客户经理），实际为业务员id
+        :param Page: 分页页数
+        :param PageSize: 每页数量
+        :return:
+        """
+        pass
+
