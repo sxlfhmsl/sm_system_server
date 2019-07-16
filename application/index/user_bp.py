@@ -46,13 +46,13 @@ class UserLogoutView(PermissionView):
         return jsonify(SUCCESS())
 
     def response_admin(self):
-        self.logout()
+        return self.logout()
 
     def response_agent(self):
-        self.logout()
+        return self.logout()
 
     def response_member(self):
-        self.logout()
+        return self.logout()
 
 
 class UserInfoView(PermissionView):
