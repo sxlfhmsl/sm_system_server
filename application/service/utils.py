@@ -97,6 +97,15 @@ class BaseService:
             return cls.MemberRole
 
     @classmethod
+    def delete_by_id(cls, m_id):
+        """
+        通过id删除记录
+        :param m_id: id
+        :return:
+        """
+        cls.BaseModel.query.filter(cls.BaseModel.ID == m_id).delete()
+
+    @classmethod
     def get_by_id(cls, m_id):
         """
         通过id查询记录
