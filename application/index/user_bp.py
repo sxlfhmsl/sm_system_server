@@ -36,6 +36,25 @@ class UserLoginView(BaseView):
             return jsonify(OTHER_ERROR)
 
 
+class UserLogoutView(PermissionView):
+    """
+    退出登录接口
+    """
+
+    def logout(self):
+        SmUserService.logout(request.headers.get('auth', None), self.u_id)
+        return jsonify(SUCCESS())
+
+    def response_admin(self):
+        self.logout()
+
+    def response_agent(self):
+        self.logout()
+
+    def response_member(self):
+        self.logout()
+
+
 class UserInfoView(PermissionView):
     """
     获取用户信息
@@ -190,6 +209,7 @@ class CreateMember(PermissionView):
 
 
 user_bp.add_url_rule('/login', methods=['POST'], view_func=UserLoginView.as_view('user_login'))
+user_bp.add_url_rule('/logout', methods=['POST'], view_func=UserLogoutView.as_view('user_logout'))
 user_bp.add_url_rule('/info', methods=['POST'], view_func=UserInfoView.as_view('user_info'))
 user_bp.add_url_rule('/create_admin', methods=['POST'], view_func=CreateAdmin.as_view('create_admin'))
 user_bp.add_url_rule('/query_admins', methods=['POST'], view_func=QueryAllAdmin.as_view('query_admins'))

@@ -4,7 +4,6 @@
 """
 import datetime
 from flask import current_app
-from sqlalchemy import func
 
 from ..dao.models import db, SmUser, SmUserAdmin
 from .utils import BaseService

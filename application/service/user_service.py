@@ -61,3 +61,17 @@ class SmUserService(BaseService):
             current_app.logger.error(e)
             return 4, None
 
+    @classmethod
+    def logout(cls, token_key, user_id):
+        """
+        退出登录
+        :param token_key: token key
+        :param user_id: 用户id
+        :return:
+        """
+        if RedisOp().get_normal(token_key):
+            RedisOp().remove_items(token_key)
+            user = SmUser.query.filter(SmUser.ID == user_id)
+            user.LastLogonTime = datetime.datetime.now()
+            db.session.commit()
+

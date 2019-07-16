@@ -19,7 +19,6 @@ def check_auth(fn):
         if auth is None:
             abort(404)
         token = RedisOp().get_normal(auth)
-        print(auth)
         # 检测不到token
         if token is None:
             abort(404)

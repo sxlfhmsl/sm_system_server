@@ -5,7 +5,7 @@
 import datetime
 from flask import current_app
 
-from ..dao.models import db, SmUserAgent, SmUserMember, SmUser, SmUserRole, SmClerk, SmUserLog
+from ..dao.models import db, SmUserAgent, SmUserMember, SmUser
 from .utils import BaseService
 
 
