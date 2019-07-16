@@ -51,5 +51,30 @@ class CreateAgent(PermissionView):
         abort(404)
 
 
+class QueryAllAgent(PermissionView):
+    """
+    查询所有的代理
+    """
+
+    def response_admin(self):
+        try:
+            code, data = SmUserAgentService.query_agent(**request.json)
+            if code == 0:
+                return jsonify(SUCCESS(data))
+            elif code == 1:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
+
+    def response_agent(self):
+        abort(404)
+
+    def response_member(self):
+        abort(404)
+
+
 user_agent_bp.add_url_rule('/create', methods=['POST'], view_func=CreateAgent.as_view('create_agent'))
+user_agent_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllAgent.as_view('all_agent'))
 

@@ -69,7 +69,8 @@ class SmUserAdminService(BaseService):
             Page = 1
             PageSize = 1000
         try:
-            page_result = SmUserAdmin.query.filter().paginate(Page, PageSize)     # 返回分页结果  items当前页结果 total数量
+            # 返回分页结果  items当前页结果 total数量
+            page_result = SmUserAdmin.query.filter().order_by(SmUserAdmin.CreateTime.desc()).paginate(Page, PageSize)
             return 0, {"total": page_result.total, "rows": cls.model_to_dict_by_dict(page_result.items)}
         except Exception as e:
             current_app.logger.error(e)
