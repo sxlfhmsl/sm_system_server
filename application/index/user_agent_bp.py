@@ -47,9 +47,6 @@ class CreateAgent(PermissionView):
             return jsonify(POST_PARA_ERROR)
         return jsonify(OTHER_ERROR)
 
-    def response_member(self):
-        abort(404)
-
 
 class QueryAllAgent(PermissionView):
     """
@@ -67,12 +64,6 @@ class QueryAllAgent(PermissionView):
             current_app.logger.error(e)
             return jsonify(POST_PARA_ERROR)
         return jsonify(OTHER_ERROR)
-
-    def response_agent(self):
-        abort(404)
-
-    def response_member(self):
-        abort(404)
 
 
 user_agent_bp.add_url_rule('/create', methods=['POST'], view_func=CreateAgent.as_view('create_agent'))

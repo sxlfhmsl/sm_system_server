@@ -32,12 +32,6 @@ class CreateAdmin(PermissionView):
             return jsonify(POST_PARA_ERROR)
         return jsonify(OTHER_ERROR)
 
-    def response_agent(self):
-        abort(404)
-
-    def response_member(self):
-        abort(404)
-
 
 class QueryAllAdmin(PermissionView):
     """
@@ -56,12 +50,6 @@ class QueryAllAdmin(PermissionView):
             return jsonify(POST_PARA_ERROR)
         return jsonify(OTHER_ERROR)
 
-    def response_agent(self):
-        abort(404)
-
-    def response_member(self):
-        abort(404)
-
 
 class QueryAdminByID(PermissionView):
 
@@ -79,12 +67,6 @@ class QueryAdminByID(PermissionView):
             return jsonify(SUCCESS(result))
         else:
             return jsonify(QUERY_NO_RESULT)
-
-    def response_agent(self):
-        abort(404)
-
-    def response_member(self):
-        abort(404)
 
 
 user_admin_bp.add_url_rule('/create', methods=['POST'], view_func=CreateAdmin.as_view('create_admin'))

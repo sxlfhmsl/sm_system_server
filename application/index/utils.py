@@ -55,13 +55,13 @@ class PermissionView(BaseView):
         self.u_role_name = None
 
     def response_admin(self):
-        raise NotImplementedError
+        abort(404)
 
     def response_agent(self):
-        raise NotImplementedError
+        abort(404)
 
     def response_member(self):
-        raise NotImplementedError
+        abort(404)
 
     def dispatch_request(self, token_dict: dict):
         self._token_data = token_dict['data']

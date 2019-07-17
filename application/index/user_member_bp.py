@@ -51,9 +51,6 @@ class CreateMember(PermissionView):
             return jsonify(POST_PARA_ERROR)
         return jsonify(OTHER_ERROR)
 
-    def response_member(self):
-        abort(404)
-
 
 class QueryAllMember(PermissionView):
     """
@@ -71,12 +68,6 @@ class QueryAllMember(PermissionView):
             current_app.logger.error(e)
             return jsonify(POST_PARA_ERROR)
         return jsonify(OTHER_ERROR)
-
-    def response_agent(self):
-        abort(404)
-
-    def response_member(self):
-        abort(404)
 
 
 user_member_bp.add_url_rule('/create', methods=['POST'], view_func=CreateMember.as_view('create_member'))
