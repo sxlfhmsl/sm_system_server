@@ -80,5 +80,5 @@ class QueryAllMember(PermissionView):
 
 
 user_member_bp.add_url_rule('/create', methods=['POST'], view_func=CreateMember.as_view('create_member'))
-user_agent_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllMember.as_view('all_member'))
+user_member_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllMember.as_view('all_member'))
 

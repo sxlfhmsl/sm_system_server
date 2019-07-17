@@ -7,8 +7,8 @@ from flask import request, jsonify, abort, current_app
 
 from .utils import BaseView, PermissionView
 from .sta_code import SUCCESS, USER_NAME_PASS_WRONG_ERROR, USER_FORBIDDEN_ERROR, USER_LOCK_ERROR, OTHER_ERROR
-from .sta_code import PERMISSION_DENIED_ERROR, USER_SAME_LOGIN_NAME, POST_PARA_ERROR, USER_AGENT_LEVEL_LOW
-from .sta_code import USER_AGENT_NOT_ENOUGH_MEMBER, USER_WRONG_PASS
+from .sta_code import PERMISSION_DENIED_ERROR, POST_PARA_ERROR
+from .sta_code import USER_WRONG_PASS
 from ..service.user_service import SmUserService
 from ..service.user_admin_service import SmUserAdminService
 from ..service.user_agent_service import SmUserAgentService
