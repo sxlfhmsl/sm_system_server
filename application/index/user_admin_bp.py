@@ -69,7 +69,28 @@ class QueryAdminByID(PermissionView):
             return jsonify(QUERY_NO_RESULT)
 
 
+class ChangeAdminByID(PermissionView):
+
+    def response_admin(self):
+        if request.json is None or request.json.get('ID', None) is None or request.json.get('LoginName', None) is None or request.json.get('NickName', None) is None:
+            return jsonify(POST_PARA_ERROR)
+        else:
+            result = SmUserAdminService.update_by_id(request.json['ID'], LoginName=request.json['LoginName'], NickName=request.json['NickName'])
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(POST_PARA_ERROR)
+            elif result == 2:
+                return jsonify(USER_SAME_LOGIN_NAME)
+        return jsonify(OTHER_ERROR)
+
+
+# 创建管理员
 user_admin_bp.add_url_rule('/create', methods=['POST'], view_func=CreateAdmin.as_view('create_admin'))
+# 查询所有管理员
 user_admin_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllAdmin.as_view('all_admin'))
+# 查询单个管理员，通过id
 user_admin_bp.add_url_rule('/query_sig/<admin_id>', methods=['POST'], view_func=QueryAdminByID.as_view('query_admin_by_id'))
+# 通过id修改管理员
+user_admin_bp.add_url_rule('/update_sig', methods=['POST'], view_func=ChangeAdminByID.as_view('update_admin_by_id'))
 

@@ -127,9 +127,18 @@ class BaseService:
         try:
             cls.BaseModel.query.filter(cls.BaseModel.ID == m_id).update(para)
             session.commit()     # 提交记录
+            return 0
+        except Exception as e:
+            session.rollback()     # 回滚
+            current_app.logger.error(e)
+        try:
+            result = cls.BaseModel.query.filter(cls.BaseModel.ID == m_id).first()
+            for key in para.keys():
+                result.__setattr__(key, para[key])
+            session.commit()     # 提交记录
+            return 0
         except Exception as e:
             session.rollback()     # 回滚
             current_app.logger.error(e)
             return 1
-        return 0
 

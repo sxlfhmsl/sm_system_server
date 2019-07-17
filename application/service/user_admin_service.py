@@ -103,4 +103,24 @@ class SmUserAdminService(BaseService):
             current_app.logger.error(e)
             return None
 
+    @classmethod
+    def update_by_id(cls, m_id, **para):
+        """
+        查询管理员
+        :param m_id: 管理员id
+        :param para: 提交参数
+        :return:
+        """
+        # 校验用户名是否重复
+        try:
+            result = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
+            if result and result.ID != m_id:
+                return 2
+            return super(SmUserAdminService, cls).update_by_id(m_id, **para)
+        except Exception as e:
+            current_app.logger.error(e)
+            return 1
+        return 0
+
+
 
