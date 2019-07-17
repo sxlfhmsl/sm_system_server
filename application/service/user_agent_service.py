@@ -106,3 +106,23 @@ class SmUserAgentService(BaseService):
             current_app.logger.error(e)
             return 1, None
 
+    @classmethod
+    def change_withdraw_pass(cls, user, old_pass, new_pass):
+        """"
+        修改提款密码
+        :param user: 目标用户
+        :param old_pass: 旧密码
+        :param new_pass: 新密码
+        :return: 执行结果    0: 执行成功， 1: 错误旧密码    2: 其他错误
+        """
+        try:
+            old_pass = cls.sha256_generator(old_pass)
+            if old_pass != user.WithdrawPassWord:
+                return 1
+            user.WithdrawPassWord = cls.sha256_generator(new_pass)
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.error(e)
+            return 2
+        return 0
+

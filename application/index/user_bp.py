@@ -99,7 +99,11 @@ class UserChangePassView(PermissionView):
 
     def response_agent(self):
         try:
-            result = SmUserService.change_login_pass(self.user, request.json.get('Old', None), request.json.get('New', None))
+            result = None
+            if request.json.get('Type', None) == 2:
+                result = SmUserAdminService.change_withdraw_pass(self.user, request.json.get('Old', None), request.json.get('New', None))
+            else:
+                result = SmUserService.change_login_pass(self.user, request.json.get('Old', None), request.json.get('New', None))
             if result == 0:
                 return jsonify(SUCCESS())
             elif result == 1:
