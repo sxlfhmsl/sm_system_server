@@ -4,6 +4,7 @@
 """
 import datetime
 from flask import current_app
+from sqlalchemy.orm import aliased
 
 from ..dao.models import db, SmUser, SmUserAdmin
 from .utils import BaseService
@@ -70,10 +71,36 @@ class SmUserAdminService(BaseService):
             PageSize = 1000
         try:
             # 返回分页结果  items当前页结果 total数量
-            page_result = SmUserAdmin.query.filter().order_by(SmUserAdmin.CreateTime.desc()).paginate(Page, PageSize)
+            page_result = SmUserAdmin.query.filter(SmUserAdmin.ID != '1').order_by(SmUserAdmin.CreateTime.desc()).paginate(Page, PageSize)
             return 0, {"total": page_result.total, "rows": cls.model_to_dict_by_dict(page_result.items)}
         except Exception as e:
             current_app.logger.error(e)
             return 1, None
+
+    @classmethod
+    def get_by_id(cls, m_id):
+        """
+        通过id返回管理员信息
+        :param m_id: 相关id
+        :return: 查询结果
+        """
+        try:
+            user_t1 = aliased(SmUser)
+            result = db.session.query(
+                SmUserAdmin.ID,
+                SmUserAdmin.LoginName,
+                SmUserAdmin.NickName,
+                SmUserAdmin.CreateTime,
+                SmUserAdmin.LastLogonTime,
+                user_t1.LoginName.label('CreatorName')).outerjoin(user_t1, user_t1.ID == SmUserAdmin.CreatorID).filter(
+                SmUserAdmin.ID != '1',
+                SmUserAdmin.ID == m_id
+            ).all()
+            if len(result) == 0:
+                return None
+            return cls.result_to_dict(result)[0]
+        except Exception as e:
+            current_app.logger.error(e)
+            return None
 
 

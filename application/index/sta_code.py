@@ -21,6 +21,7 @@ INS_ERROR = {'code': 500, 'msg': '系统内部错误'}
 POST_PARA_ERROR = {'code': 10001, 'msg': '提交参数错误'}
 OTHER_ERROR = {'code': 10002, 'msg': '其他错误'}
 PERMISSION_DENIED_ERROR = {'code': 10003, 'msg': '权限不足'}
+QUERY_NO_RESULT = {'code': 10004, 'msg': '查询不到结果'}
 
 
 # 用户相关操作错误-----登录，查询，新建等( 11001-13000)

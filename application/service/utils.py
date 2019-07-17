@@ -13,6 +13,7 @@ from ..dao.models import db, SmUserLog, SmUserAdmin, SmUserAgent, SmUserMember, 
 class BaseService:
 
     from .model_convert import model_to_dict_by_dict
+    from .model_convert import result_to_dict
     AdminRole = None
     AgentRole = None
     MemberRole = None
