@@ -131,7 +131,7 @@ class SmUserAdminService(BaseService):
         :return:
         """
         result = db.session.query(func.count(SmUserAdmin.ID)).scalar()
-        if result <= 2:
+        if result <= 2 or '1' in m_id:
             return 2
         return super(SmUserAdminService, cls).delete_by_id(*m_id)
 
