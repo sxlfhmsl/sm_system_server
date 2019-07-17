@@ -98,15 +98,6 @@ class BaseService:
             return cls.MemberRole
 
     @classmethod
-    def delete_by_id(cls, m_id):
-        """
-        通过id删除记录
-        :param m_id: id
-        :return:
-        """
-        cls.BaseModel.query.filter(cls.BaseModel.ID == m_id).delete()
-
-    @classmethod
     def get_by_id(cls, m_id):
         """
         通过id查询记录
@@ -141,4 +132,25 @@ class BaseService:
             session.rollback()     # 回滚
             current_app.logger.error(e)
             return 1
+
+    @classmethod
+    def delete_by_id(cls, *m_id):
+        """
+        通过id删除数据
+        :param m_id: 所有欲删除数据的id
+        :return:
+        """
+        session = db.session
+        try:
+            results = cls.BaseModel.query.filter(cls.BaseModel.ID.in_(m_id)).all()
+            if len(results) == 0:
+                return 1
+            for result in results:
+                session.delete(result)
+            session.commit()     # 提交记录
+        except Exception as e:
+            session.rollback()     # 回滚
+            current_app.logger.error(e)
+            return 1
+        return 0
 

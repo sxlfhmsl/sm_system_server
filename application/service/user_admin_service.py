@@ -5,6 +5,7 @@
 import datetime
 from flask import current_app
 from sqlalchemy.orm import aliased
+from sqlalchemy import func
 
 from ..dao.models import db, SmUser, SmUserAdmin
 from .utils import BaseService
@@ -122,5 +123,15 @@ class SmUserAdminService(BaseService):
             return 1
         return 0
 
-
+    @classmethod
+    def delete_by_id(cls, *m_id):
+        """
+        删除管理员， 通过id
+        :param m_id: 管理员id
+        :return:
+        """
+        result = db.session.query(func.count(SmUserAdmin.ID)).scalar()
+        if result <= 2:
+            return 2
+        return super(SmUserAdminService, cls).delete_by_id(*m_id)
 
