@@ -35,24 +35,32 @@ def query_to_dict(models):
 # 当结果为result对象列表时，result有key()方法
 def result_to_dict(result):
     try:
-        if isinstance(result, Iterable):
-            res = [dict(zip(r.keys(), r)) for r in result]
-            # 这里r为一个字典，对象传递直接改变字典属性
-            for r in res:
-                find_datetime(r)
+        if isinstance(result, list):
+            res = [result_sig_to_dict(r) for r in result]
         else:
-            res = dict(zip(result.keys(), result))
-            find_datetime(res)
+            res = result_sig_to_dict(result)
         return res
     except BaseException as e:
         print(e.args)
         return None
 
 
+def result_sig_to_dict(result):
+    buffer = {}
+    for key, value in zip(result.keys(), result):
+        if isinstance(value, Model):
+            buffer.update(model_to_dict_by_dict(value))
+        elif isinstance(value, cdatetime):
+            buffer[key] = convert_datetime(value)
+        else:
+            buffer[key] = value
+    return buffer
+
+
 def model_to_dict_by_dict(result):
     # 转换完成后，删除  '_sa_instance_state' 特殊属性
     try:
-        if isinstance(result, Iterable):
+        if isinstance(result, list):
             tmp = [dict(zip(res.__dict__.keys(), res.__dict__.values())) for res in result]
             for t in tmp:
                 t.pop('_sa_instance_state')
