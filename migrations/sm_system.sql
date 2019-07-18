@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50712
 File Encoding         : 65001
 
-Date: 2019-07-15 20:41:39
+Date: 2019-07-18 23:52:19
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -362,10 +362,12 @@ CREATE TABLE `sm_user_agent` (
   `BankAccount` varchar(30) DEFAULT NULL COMMENT '银行账号',
   `Cardholder` varchar(30) DEFAULT NULL COMMENT '银行账户名',
   `WithdrawPassWord` varchar(30) DEFAULT NULL COMMENT '取款密码',
-  `Type` int(11) DEFAULT NULL COMMENT '账户类型，正式，测试，其他',
+  `Type` int(11) NOT NULL COMMENT '账户类型，正式，测试，其他',
   `AgentLevel` int(11) unsigned NOT NULL COMMENT '代理用户等级（甄别多级代理）',
   PRIMARY KEY (`ID`),
-  CONSTRAINT `FK_Reference_2` FOREIGN KEY (`ID`) REFERENCES `sm_user` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `Type` (`Type`),
+  CONSTRAINT `FK_Reference_2` FOREIGN KEY (`ID`) REFERENCES `sm_user` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `sm_user_agent_ibfk_1` FOREIGN KEY (`Type`) REFERENCES `sm_user_type` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='代理表';
 
 -- ----------------------------
@@ -413,13 +415,15 @@ CREATE TABLE `sm_user_member` (
   `WithdrawPassWord` varchar(64) DEFAULT NULL COMMENT '取款密码',
   `EmailAddress` varchar(50) DEFAULT NULL COMMENT '邮箱地址',
   `QQNum` varchar(20) DEFAULT NULL COMMENT 'QQ号',
-  `Type` int(11) DEFAULT NULL COMMENT '账户类型，正式，测试，其他',
+  `Type` int(11) NOT NULL COMMENT '账户类型，正式，测试，其他',
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_6` (`ClerkID`),
   KEY `FK_Reference_7` (`AgentID`),
+  KEY `Type` (`Type`),
   CONSTRAINT `FK_Reference_3` FOREIGN KEY (`ID`) REFERENCES `sm_user` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_Reference_6` FOREIGN KEY (`ClerkID`) REFERENCES `sm_clerk` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `FK_Reference_7` FOREIGN KEY (`AgentID`) REFERENCES `sm_user_agent` (`ID`)
+  CONSTRAINT `FK_Reference_7` FOREIGN KEY (`AgentID`) REFERENCES `sm_user_agent` (`ID`),
+  CONSTRAINT `sm_user_member_ibfk_1` FOREIGN KEY (`Type`) REFERENCES `sm_user_type` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='会员表';
 
 -- ----------------------------
@@ -443,3 +447,21 @@ CREATE TABLE `sm_user_role` (
 INSERT INTO `sm_user_role` VALUES ('2800d5549b224f0e0a36be4880830f8b', 'Member', '会员');
 INSERT INTO `sm_user_role` VALUES ('dcf76f2e05fc5394efe44f5b23cb3a9a', 'Agent', '代理');
 INSERT INTO `sm_user_role` VALUES ('eabbb5362bedec4981e460c40e60a55b', 'Admin', '管理员');
+
+-- ----------------------------
+-- Table structure for sm_user_type
+-- ----------------------------
+DROP TABLE IF EXISTS `sm_user_type`;
+CREATE TABLE `sm_user_type` (
+  `ID` int(11) NOT NULL,
+  `Name` varchar(50) NOT NULL COMMENT '名称',
+  `Description` varchar(255) NOT NULL COMMENT '描述',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户类型表，正式，测试，其他';
+
+-- ----------------------------
+-- Records of sm_user_type
+-- ----------------------------
+INSERT INTO `sm_user_type` VALUES ('1', 'Formal', '正式');
+INSERT INTO `sm_user_type` VALUES ('2', 'Test', '测试');
+INSERT INTO `sm_user_type` VALUES ('99', 'Other', '其他');

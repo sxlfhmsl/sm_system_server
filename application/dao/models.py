@@ -237,8 +237,10 @@ class SmUserAgent(SmUser):
     BankAccount = db.Column(db.String(30))
     Cardholder = db.Column(db.String(30))
     WithdrawPassWord = db.Column(db.String(30))
-    Type = db.Column(db.Integer)
+    Type = db.Column(db.ForeignKey('sm_user_type.ID'), nullable=False, index=True)
     AgentLevel = db.Column(db.Integer, nullable=False)
+
+    sm_user_type = db.relationship('SmUserType', primaryjoin='SmUserAgent.Type == SmUserType.ID', backref='sm_user_agents')
 
 
 class SmUserMember(SmUser):
@@ -260,10 +262,11 @@ class SmUserMember(SmUser):
     WithdrawPassWord = db.Column(db.String(64))
     EmailAddress = db.Column(db.String(50))
     QQNum = db.Column(db.String(20))
-    Type = db.Column(db.Integer)
+    Type = db.Column(db.ForeignKey('sm_user_type.ID'), nullable=False, index=True)
 
     sm_user_agent = db.relationship('SmUserAgent', primaryjoin='SmUserMember.AgentID == SmUserAgent.ID', backref='sm_user_members')
     sm_clerk = db.relationship('SmClerk', primaryjoin='SmUserMember.ClerkID == SmClerk.ID', backref='sm_user_members')
+    sm_user_type = db.relationship('SmUserType', primaryjoin='SmUserMember.Type == SmUserType.ID', backref='sm_user_members')
 
 
 class SmUserLog(db.Model):
@@ -285,3 +288,11 @@ class SmUserRole(db.Model):
     ID = db.Column(db.String(64), primary_key=True)
     Name = db.Column(db.String(50), nullable=False)
     Description = db.Column(db.String(255))
+
+
+class SmUserType(db.Model):
+    __tablename__ = 'sm_user_type'
+
+    ID = db.Column(db.Integer, primary_key=True)
+    Name = db.Column(db.String(50), nullable=False)
+    Description = db.Column(db.String(255), nullable=False)
