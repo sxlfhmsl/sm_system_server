@@ -112,9 +112,9 @@ user_admin_bp.add_url_rule('/create', methods=['POST'], view_func=CreateAdmin.as
 # 查询所有管理员
 user_admin_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllAdmin.as_view('all_admin'))
 # 查询单个管理员，通过id
-user_admin_bp.add_url_rule('/query_sig/<admin_id>', methods=['POST'], view_func=QueryAdminByID.as_view('query_admin_by_id'))
+user_admin_bp.add_url_rule('/query/<admin_id>', methods=['POST'], view_func=QueryAdminByID.as_view('query_admin_by_id'))
 # 通过id修改管理员
-user_admin_bp.add_url_rule('/update_sig', methods=['POST'], view_func=ChangeAdminByID.as_view('update_admin_by_id'))
+user_admin_bp.add_url_rule('/update', methods=['POST'], view_func=ChangeAdminByID.as_view('update_admin_by_id'))
 # 通过id删除管理员
 user_admin_bp.add_url_rule('/delete/<admin_id>', methods=['POST'], view_func=DeleteAdminByID.as_view('delete_admin_by_id'))
 

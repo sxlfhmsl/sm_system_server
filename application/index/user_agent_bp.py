@@ -66,6 +66,16 @@ class QueryAllAgent(PermissionView):
         return jsonify(OTHER_ERROR)
 
 
+class QueryAgentByID(PermissionView):
+    """
+    查询指定id的代理
+    """
+
+
+# 创建代理
 user_agent_bp.add_url_rule('/create', methods=['POST'], view_func=CreateAgent.as_view('create_agent'))
+# 查询所有代理
 user_agent_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllAgent.as_view('all_agent'))
+# 查询单个代理，通过id
+user_agent_bp.add_url_rule('/query/<admin_id>', methods=['POST'], view_func=QueryAgentByID.as_view('query_agent_by_id'))
 
