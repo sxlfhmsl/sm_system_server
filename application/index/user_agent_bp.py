@@ -169,6 +169,20 @@ class ChangeAgentByID(PermissionView):
         return jsonify(OTHER_ERROR)
 
 
+class DeleteAgentByID(PermissionView):
+
+    def __init__(self):
+        super(DeleteAgentByID, self).__init__()
+        self.agent_id = None    # 带查询的管理员id
+
+    def dispatch_request(self, token_dict: dict, admin_id):
+        self.agent_id = admin_id.split(',')
+        return super(DeleteAgentByID, self).dispatch_request(token_dict)
+
+    def response_admin(self):
+        pass
+
+
 # 创建代理
 user_agent_bp.add_url_rule('/create', methods=['POST'], view_func=CreateAgent.as_view('create_agent'))
 # 查询所有代理
@@ -177,3 +191,5 @@ user_agent_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllAgent.as_
 user_agent_bp.add_url_rule('/query/<agent_id>', methods=['POST'], view_func=QueryAgentByID.as_view('query_agent_by_id'))
 # 通过id修改代理
 user_agent_bp.add_url_rule('/update/<agent_id>', methods=['POST'], view_func=ChangeAgentByID.as_view('update_agent_by_id'))
+# 通过id删除代理
+user_agent_bp.add_url_rule('/delete/<agent_id>', methods=['POST'], view_func=DeleteAdminByID.as_view('delete_agent_by_id'))

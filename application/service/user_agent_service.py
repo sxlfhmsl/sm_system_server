@@ -5,9 +5,9 @@
 import datetime
 from flask import current_app
 from sqlalchemy.orm import aliased
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 
-from ..dao.models import db, SmUser, SmUserAgent
+from ..dao.models import db, SmUser, SmUserAgent, SmUserMember
 from .utils import BaseService
 
 
@@ -255,5 +255,24 @@ class SmUserAgentService(BaseService):
         except Exception as e:
             current_app.logger.error(e)
             return 2
+        return 0
+
+    @classmethod
+    def admin_delete_by_id(cls, *m_id):
+        """
+        管理员删除代理
+        :param m_id: dai
+        :return:
+        """
+        try:
+            # 次级代理数量
+            agent_child_count = db.session.query(func.count(SmUser.ID)).filter(SmUser.CreatorID.in_(m_id)).scalar()
+            # 会员数量
+            member_child_count = db.session.query(func.count(SmUserMember.ID)).filter(SmUserMember.AgentID.in_(m_id)).scalar()
+            if agent_child_count + member_child_count > 0:
+                return 1
+
+        except Exception as e:
+            current_app.logger.error(e)
         return 0
 
