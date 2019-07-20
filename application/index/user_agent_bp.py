@@ -55,7 +55,19 @@ class QueryAllAgent(PermissionView):
 
     def response_admin(self):
         try:
-            code, data = SmUserAgentService.query_agent(**request.json)
+            code, data = SmUserAgentService.query_agent(agent_id=None, **request.json)
+            if code == 0:
+                return jsonify(SUCCESS(data))
+            elif code == 1:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
+
+    def response_agent(self):
+        try:
+            code, data = SmUserAgentService.query_agent(agent_id=self.u_id, **request.json)
             if code == 0:
                 return jsonify(SUCCESS(data))
             elif code == 1:

@@ -4,6 +4,8 @@
 """
 import datetime
 from flask import current_app
+from sqlalchemy.orm import aliased
+from sqlalchemy import and_
 
 from ..dao.models import db, SmUser, SmUserAgent
 from .utils import BaseService
@@ -86,7 +88,7 @@ class SmUserAgentService(BaseService):
         return 0
 
     @classmethod
-    def query_agent(cls, Page=None, PageSize=None):
+    def query_agent(cls, agent_id=None, Page=None, PageSize=None):
         """
         查询所有管理员，按照分页，因无搜索关键字，故不作匹配，同时不查询管理员创建者的名字
         :param Page: 第几页
@@ -100,8 +102,13 @@ class SmUserAgentService(BaseService):
             PageSize = 1000
         try:
             # 返回分页结果  items当前页结果 total数量
-            page_result = SmUserAgent.query.filter().order_by(SmUserAgent.CreateTime.desc()).paginate(Page, PageSize)
-            return 0, {"total": page_result.total, "rows": cls.model_to_dict_by_dict(page_result.items)}
+            user_t1 = aliased(SmUser)
+            search_sql = and_()
+            if agent_id:
+                search_sql = and_(SmUserAgent.CreatorID == agent_id)
+            query_sql = [SmUserAgent, user_t1.LoginName.label('CreatorName')]
+            page_result = db.session.query(*query_sql).outerjoin(user_t1, user_t1.ID == SmUserAgent.CreatorID).order_by(SmUserAgent.CreateTime.desc()).filter(search_sql).paginate(Page, PageSize)
+            return 0, {"total": page_result.total, "rows": cls.result_to_dict(page_result.items)}
         except Exception as e:
             current_app.logger.error(e)
             return 1, None
@@ -125,4 +132,24 @@ class SmUserAgentService(BaseService):
             current_app.logger.error(e)
             return 2
         return 0
+
+    @classmethod
+    def get_by_id(cls, m_id):
+        """
+        查询代理，通过id
+        :param m_id: id
+        :return: 结果
+        """
+        try:
+            user_t1 = aliased(SmUser)
+            result = db.session.query(
+                SmUserAgent, user_t1.LoginName.label('CreatorName')).outerjoin(
+                user_t1, user_t1.ID == SmUserAgent.CreatorID).filter(
+                SmUserAgent.ID == m_id).first()
+            if len(result) == 0:
+                return None
+            return cls.result_to_dict(result)
+        except Exception as e:
+            current_app.logger.error(e)
+            return None
 
