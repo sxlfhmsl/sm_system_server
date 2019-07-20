@@ -72,11 +72,19 @@ class QueryAdminByID(PermissionView):
 
 class ChangeAdminByID(PermissionView):
 
+    def __init__(self):
+        super(ChangeAdminByID, self).__init__()
+        self.admin_id = None    # 带查询的管理员id
+
+    def dispatch_request(self, token_dict: dict, admin_id):
+        self.admin_id = admin_id
+        return super(ChangeAdminByID, self).dispatch_request(token_dict)
+
     def response_admin(self):
-        if request.json is None or request.json.get('ID', None) is None or request.json.get('LoginName', None) is None or request.json.get('NickName', None) is None:
+        if request.json is None or request.json.get('ID', None) is not None or request.json.get('LoginName', None) is None or request.json.get('NickName', None) is None:
             return jsonify(POST_PARA_ERROR)
         else:
-            result = SmUserAdminService.update_by_id(request.json['ID'], LoginName=request.json['LoginName'], NickName=request.json['NickName'])
+            result = SmUserAdminService.update_by_id(self.admin_id, LoginName=request.json['LoginName'], NickName=request.json['NickName'])
             if result == 0:
                 return jsonify(SUCCESS())
             elif result == 1:
@@ -114,7 +122,7 @@ user_admin_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllAdmin.as_
 # 查询单个管理员，通过id
 user_admin_bp.add_url_rule('/query/<admin_id>', methods=['POST'], view_func=QueryAdminByID.as_view('query_admin_by_id'))
 # 通过id修改管理员
-user_admin_bp.add_url_rule('/update', methods=['POST'], view_func=ChangeAdminByID.as_view('update_admin_by_id'))
+user_admin_bp.add_url_rule('/update/<admin_id>', methods=['POST'], view_func=ChangeAdminByID.as_view('update_admin_by_id'))
 # 通过id删除管理员
 user_admin_bp.add_url_rule('/delete/<admin_id>', methods=['POST'], view_func=DeleteAdminByID.as_view('delete_admin_by_id'))
 
