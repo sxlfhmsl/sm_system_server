@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50712
 File Encoding         : 65001
 
-Date: 2019-07-18 23:52:19
+Date: 2019-07-20 15:02:16
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -314,7 +314,7 @@ CREATE TABLE `sm_user` (
   `LoginName` varchar(64) NOT NULL COMMENT '登录名',
   `NickName` varchar(64) NOT NULL COMMENT '昵称',
   `Password` varchar(255) NOT NULL COMMENT '密码',
-  `CreateTime` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  `CreateTime` datetime NOT NULL COMMENT '创建时间',
   `LastLogonTime` datetime DEFAULT NULL COMMENT '上次登录时间',
   `CreatorID` varchar(64) DEFAULT NULL COMMENT '创建者ID',
   `Forbidden` tinyint(1) unsigned zerofill NOT NULL COMMENT '是否禁用， 默认不禁用',
@@ -328,7 +328,7 @@ CREATE TABLE `sm_user` (
 -- ----------------------------
 -- Records of sm_user
 -- ----------------------------
-INSERT INTO `sm_user` VALUES ('1', 'superadmin', 'superadmin', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-12 00:19:19', '2019-07-12 00:19:19', null, '0', 'eabbb5362bedec4981e460c40e60a55b', '0');
+INSERT INTO `sm_user` VALUES ('1', 'superadmin', 'superadmin', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '2019-07-10 14:42:39', '2019-07-20 14:45:58', null, '0', 'eabbb5362bedec4981e460c40e60a55b', '0');
 
 -- ----------------------------
 -- Table structure for sm_user_admin
