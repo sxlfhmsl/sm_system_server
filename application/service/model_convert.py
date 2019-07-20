@@ -46,10 +46,32 @@ def result_to_dict(result):
 
 
 def result_sig_to_dict(result):
+    """
+    当result中存在model时，自动将model中信息整合到返回的字典中
+    :param result: 待处理的结果
+    :return:
+    """
     buffer = {}
     for key, value in zip(result.keys(), result):
         if isinstance(value, Model):
             buffer.update(model_to_dict_by_dict(value))
+        elif isinstance(value, cdatetime):
+            buffer[key] = convert_datetime(value)
+        else:
+            buffer[key] = value
+    return buffer
+
+
+def result_sig_to_dict_no_unpack(result):
+    """
+    当result中存在model时，自动将model中信息单独处理
+    :param result: 待处理的结果
+    :return:
+    """
+    buffer = {}
+    for key, value in zip(result.keys(), result):
+        if isinstance(value, Model):
+            buffer[key] = model_to_dict_by_dict(value)
         elif isinstance(value, cdatetime):
             buffer[key] = convert_datetime(value)
         else:
