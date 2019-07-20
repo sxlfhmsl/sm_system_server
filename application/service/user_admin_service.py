@@ -92,10 +92,8 @@ class SmUserAdminService(BaseService):
             result = db.session.query(
                 SmUserAdmin, user_t1.LoginName.label('CreatorName')).outerjoin(
                 user_t1, user_t1.ID == SmUserAdmin.CreatorID).filter(
-                SmUserAdmin.ID == m_id).first()
-            if len(result) == 0:
-                return None
-            return cls.result_to_dict(result)
+                SmUserAdmin.ID == m_id, SmUserAdmin.ID != '1').first()
+            return None if result is None else cls.result_to_dict(result)
         except Exception as e:
             current_app.logger.error(e)
             return None
@@ -111,7 +109,7 @@ class SmUserAdminService(BaseService):
         # 校验用户名是否重复
         try:
             result = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
-            if result and result.ID != m_id:
+            if m_id == '1' or (result and result.ID != m_id):
                 return 2
             return super(SmUserAdminService, cls).update_by_id(m_id, **para)
         except Exception as e:
