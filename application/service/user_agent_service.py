@@ -134,18 +134,19 @@ class SmUserAgentService(BaseService):
         return 0
 
     @classmethod
-    def get_by_id(cls, m_id):
+    def get_by_id(cls, m_id, user_id=None):
         """
         查询代理，通过id
         :param m_id: id
+        :param user_id: 查询者的id
         :return: 结果
         """
         try:
+            search_sql = and_(SmUserAgent.ID == m_id) if not user_id else and_(SmUserAgent.ID == m_id, SmUserAgent.CreatorID == user_id)
             user_t1 = aliased(SmUser)
             result = db.session.query(
                 SmUserAgent, user_t1.LoginName.label('CreatorName')).outerjoin(
-                user_t1, user_t1.ID == SmUserAgent.CreatorID).filter(
-                SmUserAgent.ID == m_id).first()
+                user_t1, user_t1.ID == SmUserAgent.CreatorID).filter(search_sql).first()
             if len(result) == 0:
                 return None
             return cls.result_to_dict(result)

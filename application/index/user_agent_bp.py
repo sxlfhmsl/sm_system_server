@@ -7,7 +7,7 @@ from flask.blueprints import Blueprint
 from flask import jsonify, abort, current_app, request
 
 from .utils import PermissionView
-from .sta_code import SUCCESS, USER_SAME_LOGIN_NAME, OTHER_ERROR, POST_PARA_ERROR, USER_AGENT_LEVEL_LOW
+from .sta_code import SUCCESS, USER_SAME_LOGIN_NAME, OTHER_ERROR, POST_PARA_ERROR, USER_AGENT_LEVEL_LOW, QUERY_NO_RESULT
 from ..service.user_agent_service import SmUserAgentService
 
 user_agent_bp = Blueprint('user/agent', __name__)
@@ -82,6 +82,27 @@ class QueryAgentByID(PermissionView):
     """
     查询指定id的代理
     """
+    def __init__(self):
+        super(QueryAgentByID, self).__init__()
+        self.agent_id = None    # 带查询的代理id
+
+    def dispatch_request(self, token_dict: dict, agent_id):
+        self.agent_id = agent_id
+        return super(QueryAgentByID, self).dispatch_request(token_dict)
+
+    def response_admin(self):
+        result = SmUserAgentService.get_by_id(self.agent_id)
+        if result:
+            return jsonify(SUCCESS(result))
+        else:
+            return jsonify(QUERY_NO_RESULT)
+
+    def response_agent(self):
+        result = SmUserAgentService.get_by_id(self.agent_id, self.u_id)
+        if result:
+            return jsonify(SUCCESS(result))
+        else:
+            return jsonify(QUERY_NO_RESULT)
 
 
 # 创建代理
@@ -89,5 +110,5 @@ user_agent_bp.add_url_rule('/create', methods=['POST'], view_func=CreateAgent.as
 # 查询所有代理
 user_agent_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllAgent.as_view('all_agent'))
 # 查询单个代理，通过id
-user_agent_bp.add_url_rule('/query/<admin_id>', methods=['POST'], view_func=QueryAgentByID.as_view('query_agent_by_id'))
+user_agent_bp.add_url_rule('/query/<agent_id>', methods=['POST'], view_func=QueryAgentByID.as_view('query_agent_by_id'))
 
