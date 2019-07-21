@@ -125,7 +125,8 @@ class SmUserAdminService(BaseService):
         :return:
         """
         result = db.session.query(func.count(SmUserAdmin.ID)).scalar()
-        if result <= 2 or '1' in m_id:     # 只存在一个管理员和一个超级管理员时禁止删除
+        print(result)
+        if result <= 2 or m_id == '1':     # 只存在一个管理员和一个超级管理员时禁止删除
             return 2
         return super(SmUserAdminService, cls).delete_by_id(m_id)
 

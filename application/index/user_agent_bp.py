@@ -8,7 +8,7 @@ from flask import jsonify, abort, current_app, request
 
 from .utils import PermissionView
 from .sta_code import SUCCESS, USER_SAME_LOGIN_NAME, OTHER_ERROR, POST_PARA_ERROR, USER_AGENT_LEVEL_LOW, QUERY_NO_RESULT
-from .sta_code import USER_AGENT_NOT_ENOUGH_MEMBER
+from .sta_code import USER_AGENT_NOT_ENOUGH_MEMBER, USER_AGENT_MEMBER_NOT_NULL, PERMISSION_DENIED_ERROR
 from ..service.user_agent_service import SmUserAgentService
 
 user_agent_bp = Blueprint('user/agent', __name__)
@@ -175,12 +175,43 @@ class DeleteAgentByID(PermissionView):
         super(DeleteAgentByID, self).__init__()
         self.agent_id = None    # 带查询的管理员id
 
-    def dispatch_request(self, token_dict: dict, admin_id):
-        self.agent_id = admin_id.split(',')
+    def dispatch_request(self, token_dict: dict, agent_id):
+        self.agent_id = agent_id
         return super(DeleteAgentByID, self).dispatch_request(token_dict)
 
     def response_admin(self):
-        pass
+        result = 0
+        try:
+            result = SmUserAgentService.admin_delete_by_id(self.agent_id)
+        except Exception as e:
+            result = 3
+            current_app.logger.error(e)
+        if result == 0:
+            return jsonify(SUCCESS())
+        elif result == 1:
+            return jsonify(USER_AGENT_MEMBER_NOT_NULL)
+        elif result == 2:
+            return jsonify(POST_PARA_ERROR)
+        else:
+            return jsonify(OTHER_ERROR)
+
+    def response_agent(self):
+        result = 0
+        try:
+            result = SmUserAgentService.agent_delete_by_id(self.user, self.agent_id)
+        except Exception as e:
+            result = 4
+            current_app.logger.error(e)
+        if result == 0:
+            return jsonify(SUCCESS())
+        elif result == 1:
+            return jsonify(PERMISSION_DENIED_ERROR)
+        elif result == 2:
+            return jsonify(USER_AGENT_MEMBER_NOT_NULL)
+        elif result == 3:
+            return jsonify(POST_PARA_ERROR)
+        else:
+            return jsonify(OTHER_ERROR)
 
 
 # 创建代理
@@ -192,4 +223,4 @@ user_agent_bp.add_url_rule('/query/<agent_id>', methods=['POST'], view_func=Quer
 # 通过id修改代理
 user_agent_bp.add_url_rule('/update/<agent_id>', methods=['POST'], view_func=ChangeAgentByID.as_view('update_agent_by_id'))
 # 通过id删除代理
-user_agent_bp.add_url_rule('/delete/<agent_id>', methods=['POST'], view_func=DeleteAdminByID.as_view('delete_agent_by_id'))
+user_agent_bp.add_url_rule('/delete/<agent_id>', methods=['POST'], view_func=DeleteAgentByID.as_view('delete_agent_by_id'))

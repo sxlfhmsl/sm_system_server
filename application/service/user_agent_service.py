@@ -258,21 +258,50 @@ class SmUserAgentService(BaseService):
         return 0
 
     @classmethod
-    def admin_delete_by_id(cls, *m_id):
+    def admin_delete_by_id(cls, m_id):
         """
-        管理员删除代理
+        管理员删除代理，通过id
         :param m_id: dai
-        :return:
+        :return: 代码    返回结果
+                 0       修改完成
+                 1       代理名下会员不为空或者代理不存在
+                 2       参数错误
         """
         try:
-            # 次级代理数量
-            agent_child_count = db.session.query(func.count(SmUser.ID)).filter(SmUser.CreatorID.in_(m_id)).scalar()
-            # 会员数量
-            member_child_count = db.session.query(func.count(SmUserMember.ID)).filter(SmUserMember.AgentID.in_(m_id)).scalar()
-            if agent_child_count + member_child_count > 0:
+            target = SmUserAgent.query.filter(SmUserAgent.ID == m_id).first()     # 获取欲删除目标
+            if target is None or target.MemberNum != 0:
                 return 1
-
+            if target.AgentLevel != 1:     # 归还会员数量
+                creator = SmUserAgent.query.filter(SmUserAgent.ID == target.CreatorID).with_for_update().first()
+                creator.MemberNum = creator.MemberNum - target.MemberMaximum
+            super(SmUserAgentService, cls).delete_by_id(m_id)
         except Exception as e:
             current_app.logger.error(e)
+            return 2
+        return 0
+
+    @classmethod
+    def agent_delete_by_id(cls, agent_user,  m_id):
+        """
+        代理删除次级代理，通过id
+        :param agent_user: 操作者
+        :param m_id: 次级代理id
+        :return: 代码    返回结果
+                 0       修改完成
+                 1       权限不足
+                 2       代理名下会员不为空或者代理不存在
+                 3       参数错误
+        """
+        try:
+            target = SmUserAgent.query.filter(SmUserAgent.ID == m_id).first()     # 获取欲删除目标
+            if agent_user.ID != target.CreatorID:
+                return 1
+            if target is None or target.MemberNum != 0:
+                return 2
+            agent_user.MemberNum = agent_user.MemberNum - target.MemberMaximum
+            super(SmUserAgentService, cls).delete_by_id(m_id)
+        except Exception as e:
+            current_app.logger.error(e)
+            return 3
         return 0
 
