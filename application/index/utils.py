@@ -35,6 +35,16 @@ class BaseView(View):
     """
     基础View，拦截未登录，进行预处理
     """
+    para_legal_list = []
+
+    @classmethod
+    def unpack_para(cls, params: dict):
+        """
+        解析出欲修改数据
+        :param params: 所有参数
+        :return:
+        """
+        return {key: params[key] for key in params.keys() if key in cls.para_legal_list}
 
     def dispatch_request(self):
         # 暂时404

@@ -112,6 +112,8 @@ class ChangeAgentByID(PermissionView):
     """
     通过id更新代理信息， 管理员可以任意修改，代理只可修改自身次级代理
     """
+    para_legal_list = ['LoginName', 'NickName', 'Margin', 'TestMargin', 'CommissionRatio', 'ExchangeRate',
+                       'MemberPrefix', 'MemberMaximum', 'Bank', 'BankAccount', 'Cardholder']
 
     def __init__(self):
         super(ChangeAgentByID, self).__init__()
@@ -120,17 +122,6 @@ class ChangeAgentByID(PermissionView):
     def dispatch_request(self, token_dict: dict, agent_id):
         self.agent_id = agent_id
         return super(ChangeAgentByID, self).dispatch_request(token_dict)
-
-    @staticmethod
-    def unpack_para(params: dict):
-        """
-        解析出欲修改数据
-        :param params: 所有参数
-        :return:
-        """
-        para_legal_list = ['LoginName', 'NickName', 'Margin', 'TestMargin', 'CommissionRatio', 'ExchangeRate',
-                           'MemberPrefix', 'MemberMaximum', 'Bank', 'BankAccount', 'Cardholder']
-        return {key: params[key] for key in params.keys() if key in para_legal_list}
 
     def response_admin(self):
         result = 0
