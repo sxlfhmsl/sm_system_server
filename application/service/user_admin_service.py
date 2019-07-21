@@ -118,14 +118,14 @@ class SmUserAdminService(BaseService):
         return 0
 
     @classmethod
-    def delete_by_id(cls, *m_id):
+    def delete_by_id(cls, m_id):
         """
         删除管理员， 通过id
         :param m_id: 管理员id
         :return:
         """
         result = db.session.query(func.count(SmUserAdmin.ID)).scalar()
-        if result <= 2 or '1' in m_id:
+        if result <= 2 or '1' in m_id:     # 只存在一个管理员和一个超级管理员时禁止删除
             return 2
-        return super(SmUserAdminService, cls).delete_by_id(*m_id)
+        return super(SmUserAdminService, cls).delete_by_id(m_id)
 

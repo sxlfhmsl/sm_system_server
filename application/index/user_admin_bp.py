@@ -101,11 +101,11 @@ class DeleteAdminByID(PermissionView):
         self.admin_id = None    # 带查询的管理员id
 
     def dispatch_request(self, token_dict: dict, admin_id):
-        self.admin_id = admin_id.split(',')
+        self.admin_id = admin_id
         return super(DeleteAdminByID, self).dispatch_request(token_dict)
 
     def response_admin(self):
-        result = SmUserAdminService.delete_by_id(*self.admin_id)
+        result = SmUserAdminService.delete_by_id(self.admin_id)
         if result == 0:
             return jsonify(SUCCESS(result))
         elif result == 1:
