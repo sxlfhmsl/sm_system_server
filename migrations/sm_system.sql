@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50712
 File Encoding         : 65001
 
-Date: 2019-07-20 15:02:16
+Date: 2019-07-23 01:13:10
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -404,6 +404,7 @@ CREATE TABLE `sm_user_member` (
   `ClerkID` varchar(64) DEFAULT NULL COMMENT '业务员ID',
   `CustomerName` varchar(30) DEFAULT NULL COMMENT '客户姓名',
   `Margin` double DEFAULT NULL COMMENT '保证金',
+  `Earning` double unsigned zerofill NOT NULL COMMENT '客户总盈亏',
   `PhoneNum` varchar(20) DEFAULT NULL COMMENT '手机号码',
   `BuyFeeRate` double DEFAULT NULL COMMENT '买入手续费',
   `SellFeeRate` double DEFAULT NULL COMMENT '卖出手续费',

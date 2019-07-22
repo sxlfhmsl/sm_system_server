@@ -251,6 +251,7 @@ class SmUserMember(SmUser):
     ClerkID = db.Column(db.ForeignKey('sm_clerk.ID', ondelete='SET NULL', onupdate='CASCADE'), index=True)
     CustomerName = db.Column(db.String(30))
     Margin = db.Column(db.Float(asdecimal=True))
+    Earning = db.Column(db.Float(asdecimal=True), nullable=False)
     PhoneNum = db.Column(db.String(20))
     BuyFeeRate = db.Column(db.Float(asdecimal=True))
     SellFeeRate = db.Column(db.Float(asdecimal=True))
