@@ -18,9 +18,13 @@ class CreateAgent(PermissionView):
     """
     创建代理
     """
+    para_legal_list = ['LoginName', 'NickName', 'Password', 'Margin', 'TestMargin', 'CommissionRatio', 'ExchangeRate',
+                       'MemberPrefix', 'MemberMaximum', 'Bank', 'BankAccount', 'Cardholder', 'WithdrawPassWord',
+                       'Type']
+
     def response_admin(self):
         try:
-            result = SmUserAgentService.admin_create_agent(self.user, **request.json)
+            result = SmUserAgentService.admin_create_agent(self.user, **self.unpack_para(request.json))
             if result == 0:                                                        # 添加成功
                 return jsonify(SUCCESS())
             elif result == 1:                                                      # 相同用户名
@@ -34,7 +38,7 @@ class CreateAgent(PermissionView):
 
     def response_agent(self):
         try:
-            result = SmUserAgentService.agent_create_agent(self.user, **request.json)
+            result = SmUserAgentService.agent_create_agent(self.user, **self.unpack_para(request.json))
             if result == 0:                                                        # 添加成功
                 return jsonify(SUCCESS())
             elif result == 1:                                                      # 相同用户名
@@ -55,11 +59,13 @@ class QueryAllAgent(PermissionView):
     """
     查询所有的代理
     """
+    para_legal_list = ['Password', 'CreatorID', 'RoleID', 'WithdrawPassWord', 'Cardholder', 'BankAccount', 'Bank']
 
     def response_admin(self):
         try:
             code, data = SmUserAgentService.admin_query_agent(**request.json)
             if code == 0:
+                self.pop_no_need(data['rows'])
                 return jsonify(SUCCESS(data))
             elif code == 1:
                 return jsonify(OTHER_ERROR)
@@ -72,6 +78,7 @@ class QueryAllAgent(PermissionView):
         try:
             code, data = SmUserAgentService.agent_query_agent(self.user, **request.json)
             if code == 0:
+                self.pop_no_need(data['rows'])
                 return jsonify(SUCCESS(data))
             elif code == 1:
                 return jsonify(OTHER_ERROR)
@@ -85,6 +92,8 @@ class QueryAgentByID(PermissionView):
     """
     查询指定id的代理
     """
+    para_legal_list = ['Password', 'CreatorID', 'RoleID', 'WithdrawPassWord']
+
     def __init__(self):
         super(QueryAgentByID, self).__init__()
         self.agent_id = None    # 带查询的代理id
@@ -96,6 +105,7 @@ class QueryAgentByID(PermissionView):
     def response_admin(self):
         result = SmUserAgentService.get_by_id(self.agent_id)
         if result:
+            self.pop_no_need(result)
             return jsonify(SUCCESS(result))
         else:
             return jsonify(QUERY_NO_RESULT)
@@ -103,6 +113,7 @@ class QueryAgentByID(PermissionView):
     def response_agent(self):
         result = SmUserAgentService.agent_query_by_id(self.user, self.agent_id)
         if result:
+            self.pop_no_need(result)
             return jsonify(SUCCESS(result))
         else:
             return jsonify(QUERY_NO_RESULT)
