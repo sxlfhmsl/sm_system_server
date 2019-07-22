@@ -18,9 +18,10 @@ class CreateMember(PermissionView):
     """
     创建会员操作
     """
-    para_legal_list = ['AgentID', 'LoginName', 'NickName', 'ClerkID', 'Password', 'Margin', 'PhoneNum', 'BuyFeeRate',
-                       'SellFeeRate', 'RiseFallSpreadRate', 'Bank', 'BankAccount', 'Cardholder', 'OpeningBank',
-                       'WithdrawPassWord', 'QQNum', 'Type']
+    para_legal_list_recv = [
+        'AgentID', 'LoginName', 'NickName', 'ClerkID', 'Password', 'Margin', 'PhoneNum', 'BuyFeeRate',
+        'SellFeeRate', 'RiseFallSpreadRate', 'Bank', 'BankAccount', 'Cardholder', 'OpeningBank',
+        'WithdrawPassWord', 'QQNum', 'Type']
 
     def response_admin(self):
         try:
@@ -59,6 +60,8 @@ class QueryAllMember(PermissionView):
     """
     查询所有的会员
     """
+    para_legal_list_recv = ['AgentID', 'LoginName', 'NickName']
+    para_legal_list_return = ['Password', 'CreatorID', 'RoleID', 'WithdrawPassWord', 'Cardholder', 'BankAccount', 'Bank']
 
     def response_admin(self):
         try:
