@@ -59,21 +59,25 @@ class UserInfoView(PermissionView):
     """
     获取用户信息
     """
+    para_legal_list = ['Password', 'Forbidden', 'RoleID', 'Lock', 'CreatorID']
 
     def response_admin(self):
         result = SmUserAdminService.get_by_id(self.u_id)
+        self.pop_no_need(result)
         if result:
             return jsonify(SUCCESS(result))
         return jsonify(PERMISSION_DENIED_ERROR)
 
     def response_agent(self):
         result = SmUserAgentService.get_by_id(self.u_id)
+        self.pop_no_need(result)
         if result:
             return jsonify(SUCCESS(result))
         return jsonify(PERMISSION_DENIED_ERROR)
 
     def response_member(self):
         result = SmUserMemberService.get_by_id(self.u_id)
+        self.pop_no_need(result)
         if result:
             return jsonify(SUCCESS(result))
         return jsonify(PERMISSION_DENIED_ERROR)

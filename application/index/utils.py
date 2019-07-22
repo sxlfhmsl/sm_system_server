@@ -46,6 +46,21 @@ class BaseView(View):
         """
         return {key: params[key] for key in params.keys() if key in cls.para_legal_list}
 
+    @classmethod
+    def pop_no_need(cls, a_para: dict):
+        """
+        弹出非必须参数
+        :param a_para: 弹出目标(list, 或者 dict)
+        :return:
+        """
+        if isinstance(a_para, list):
+            for para in a_para:
+                for key in cls.para_legal_list:
+                    para.pop(key, None)
+        else:
+            for key in cls.para_legal_list:
+                a_para.pop(key, None)
+
     def dispatch_request(self):
         # 暂时404
         abort(404)
