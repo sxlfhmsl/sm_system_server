@@ -18,10 +18,13 @@ class CreateMember(PermissionView):
     """
     创建会员操作
     """
+    para_legal_list = ['AgentID', 'LoginName', 'NickName', 'ClerkID', 'Password', 'Margin', 'PhoneNum', 'BuyFeeRate',
+                       'SellFeeRate', 'RiseFallSpreadRate', 'Bank', 'BankAccount', 'Cardholder', 'OpeningBank',
+                       'WithdrawPassWord', 'QQNum', 'Type']
 
     def response_admin(self):
         try:
-            result = SmUserMemberService.admin_create_member(self.user, **request.json)
+            result = SmUserMemberService.admin_create_member(self.user, **self.unpack_para(request.json))
             if result == 0:                                                        # 添加成功
                 return jsonify(SUCCESS())
             if result == 1:                                                        # 相同登录名
@@ -37,7 +40,7 @@ class CreateMember(PermissionView):
 
     def response_agent(self):
         try:
-            result = SmUserMemberService.agent_create_member(self.user, **request.json)
+            result = SmUserMemberService.agent_create_member(self.user, **self.unpack_para(request.json))
             if result == 0:                                                        # 添加成功
                 return jsonify(SUCCESS())
             if result == 1:                                                        # 相同登录名
