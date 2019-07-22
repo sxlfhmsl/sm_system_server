@@ -38,7 +38,7 @@ class QueryAllAdmin(PermissionView):
     """
     查询所有的管理员
     """
-    para_legal_list = ['Password', 'CreatorID', 'Forbidden', 'RoleID', 'Lock']
+    para_legal_list = ['Password', 'CreatorID', 'RoleID', 'Lock']
 
     def response_admin(self):
         try:
@@ -55,6 +55,9 @@ class QueryAllAdmin(PermissionView):
 
 
 class QueryAdminByID(PermissionView):
+    """
+    通过id查询管理员详细信息
+    """
 
     para_legal_list = ['Password', 'CreatorID', 'Forbidden', 'RoleID', 'Lock']
 
@@ -69,12 +72,17 @@ class QueryAdminByID(PermissionView):
     def response_admin(self):
         result = SmUserAdminService.get_by_id(self.admin_id)
         if result:
+            self.pop_no_need(result)
             return jsonify(SUCCESS(result))
         else:
             return jsonify(QUERY_NO_RESULT)
 
 
 class ChangeAdminByID(PermissionView):
+    """
+    通过id修改管理员信息
+    """
+    para_legal_list = ['LoginName', 'NickName']
 
     def __init__(self):
         super(ChangeAdminByID, self).__init__()
@@ -85,20 +93,20 @@ class ChangeAdminByID(PermissionView):
         return super(ChangeAdminByID, self).dispatch_request(token_dict)
 
     def response_admin(self):
-        if request.json is None or request.json.get('ID', None) is not None or request.json.get('LoginName', None) is None or request.json.get('NickName', None) is None:
-            return jsonify(POST_PARA_ERROR)
-        else:
-            result = SmUserAdminService.update_by_id(self.admin_id, LoginName=request.json['LoginName'], NickName=request.json['NickName'])
-            if result == 0:
-                return jsonify(SUCCESS())
-            elif result == 1:
-                return jsonify(DELETE_NOT_EXITS)
-            elif result == 2:
-                return jsonify(USER_SAME_LOGIN_NAME)
+        result = SmUserAdminService.update_by_id(self.admin_id, **self.unpack_para(request.json))
+        if result == 0:
+            return jsonify(SUCCESS())
+        elif result == 1:
+            return jsonify(DELETE_NOT_EXITS)
+        elif result == 2:
+            return jsonify(USER_SAME_LOGIN_NAME)
         return jsonify(OTHER_ERROR)
 
 
 class DeleteAdminByID(PermissionView):
+    """
+    通过id删除管理员
+    """
 
     def __init__(self):
         super(DeleteAdminByID, self).__init__()
