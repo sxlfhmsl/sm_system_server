@@ -57,7 +57,7 @@ class BaseView(View):
             for para in a_para:
                 for key in cls.para_legal_list:
                     para.pop(key, None)
-        else:
+        elif isinstance(a_para, dict):
             for key in cls.para_legal_list:
                 a_para.pop(key, None)
 

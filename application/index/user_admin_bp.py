@@ -38,11 +38,13 @@ class QueryAllAdmin(PermissionView):
     """
     查询所有的管理员
     """
+    para_legal_list = ['Password', 'CreatorID', 'Forbidden', 'RoleID', 'Lock']
 
     def response_admin(self):
         try:
             code, data = SmUserAdminService.query_admin(**request.json)
             if code == 0:
+                self.pop_no_need(data['rows'])
                 return jsonify(SUCCESS(data))
             elif code == 1:
                 return jsonify(OTHER_ERROR)
@@ -53,6 +55,8 @@ class QueryAllAdmin(PermissionView):
 
 
 class QueryAdminByID(PermissionView):
+
+    para_legal_list = ['Password', 'CreatorID', 'Forbidden', 'RoleID', 'Lock']
 
     def __init__(self):
         super(QueryAdminByID, self).__init__()
