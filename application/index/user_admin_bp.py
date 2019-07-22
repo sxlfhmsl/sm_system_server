@@ -18,10 +18,11 @@ class CreateAdmin(PermissionView):
     """
     创建管理员
     """
+    para_legal_list = ['LoginName', 'NickName', 'Password']
 
     def response_admin(self):
         try:
-            result = SmUserAdminService.create_admin(CreatorID=self.u_id, **request.json)
+            result = SmUserAdminService.create_admin(CreatorID=self.u_id, **self.unpack_para(request.json))
             if result == 0:
                 return jsonify(SUCCESS())
             elif result == 1:
