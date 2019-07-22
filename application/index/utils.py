@@ -35,30 +35,31 @@ class BaseView(View):
     """
     基础View，拦截未登录，进行预处理
     """
-    para_legal_list = []
+    para_legal_list_recv = []    # 接收参数过滤列表
+    para_legal_list_return = []    # 返回参数过滤列表
 
     @classmethod
     def unpack_para(cls, params: dict):
         """
-        解析出欲修改数据
+        解析出欲修改数据    para_legal_list_recv
         :param params: 所有参数
         :return:
         """
-        return {key: params[key] for key in params.keys() if key in cls.para_legal_list}
+        return {key: params[key] for key in params.keys() if key in cls.para_legal_list_recv}
 
     @classmethod
     def pop_no_need(cls, a_para: dict):
         """
-        弹出非必须参数
+        弹出非必须参数    para_legal_list_return
         :param a_para: 弹出目标(list, 或者 dict)
         :return:
         """
         if isinstance(a_para, list):
             for para in a_para:
-                for key in cls.para_legal_list:
+                for key in cls.para_legal_list_return:
                     para.pop(key, None)
         elif isinstance(a_para, dict):
-            for key in cls.para_legal_list:
+            for key in cls.para_legal_list_return:
                 a_para.pop(key, None)
 
     def dispatch_request(self):

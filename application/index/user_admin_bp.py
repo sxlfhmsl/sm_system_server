@@ -18,7 +18,7 @@ class CreateAdmin(PermissionView):
     """
     创建管理员
     """
-    para_legal_list = ['LoginName', 'NickName', 'Password']
+    para_legal_list_recv = ['LoginName', 'NickName', 'Password']
 
     def response_admin(self):
         try:
@@ -39,11 +39,12 @@ class QueryAllAdmin(PermissionView):
     """
     查询所有的管理员
     """
-    para_legal_list = ['Password', 'CreatorID', 'RoleID', 'Lock']
+    para_legal_list_recv = ['Page', 'PageSize']
+    para_legal_list_return = ['Password', 'CreatorID', 'RoleID', 'Lock']
 
     def response_admin(self):
         try:
-            code, data = SmUserAdminService.query_admin(**request.json)
+            code, data = SmUserAdminService.query_admin(**self.unpack_para(request.json))
             if code == 0:
                 self.pop_no_need(data['rows'])
                 return jsonify(SUCCESS(data))
@@ -60,7 +61,7 @@ class QueryAdminByID(PermissionView):
     通过id查询管理员详细信息
     """
 
-    para_legal_list = ['Password', 'CreatorID', 'Forbidden', 'RoleID', 'Lock']
+    para_legal_list_return = ['Password', 'CreatorID', 'Forbidden', 'RoleID', 'Lock']
 
     def __init__(self):
         super(QueryAdminByID, self).__init__()
@@ -83,7 +84,7 @@ class ChangeAdminByID(PermissionView):
     """
     通过id修改管理员信息
     """
-    para_legal_list = ['LoginName', 'NickName']
+    para_legal_list_recv = ['LoginName', 'NickName']
 
     def __init__(self):
         super(ChangeAdminByID, self).__init__()

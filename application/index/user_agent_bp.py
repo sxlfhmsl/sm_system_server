@@ -18,9 +18,10 @@ class CreateAgent(PermissionView):
     """
     创建代理
     """
-    para_legal_list = ['LoginName', 'NickName', 'Password', 'Margin', 'TestMargin', 'CommissionRatio', 'ExchangeRate',
-                       'MemberPrefix', 'MemberMaximum', 'Bank', 'BankAccount', 'Cardholder', 'WithdrawPassWord',
-                       'Type']
+    para_legal_list_recv = [
+        'LoginName', 'NickName', 'Password', 'Margin', 'TestMargin', 'CommissionRatio', 'ExchangeRate',
+        'MemberPrefix', 'MemberMaximum', 'Bank', 'BankAccount', 'Cardholder', 'WithdrawPassWord',
+        'Type']
 
     def response_admin(self):
         try:
@@ -59,11 +60,12 @@ class QueryAllAgent(PermissionView):
     """
     查询所有的代理
     """
-    para_legal_list = ['Password', 'CreatorID', 'RoleID', 'WithdrawPassWord', 'Cardholder', 'BankAccount', 'Bank']
+    para_legal_list_recv = ['Page', 'PageSize']
+    para_legal_list_return = ['Password', 'CreatorID', 'RoleID', 'WithdrawPassWord', 'Cardholder', 'BankAccount', 'Bank']
 
     def response_admin(self):
         try:
-            code, data = SmUserAgentService.admin_query_agent(**request.json)
+            code, data = SmUserAgentService.admin_query_agent(**self.unpack_para(request.json))
             if code == 0:
                 self.pop_no_need(data['rows'])
                 return jsonify(SUCCESS(data))
@@ -92,7 +94,7 @@ class QueryAgentByID(PermissionView):
     """
     查询指定id的代理
     """
-    para_legal_list = ['Password', 'CreatorID', 'RoleID', 'WithdrawPassWord']
+    para_legal_list_return = ['Password', 'CreatorID', 'RoleID', 'WithdrawPassWord']
 
     def __init__(self):
         super(QueryAgentByID, self).__init__()
@@ -123,8 +125,8 @@ class ChangeAgentByID(PermissionView):
     """
     通过id更新代理信息， 管理员可以任意修改，代理只可修改自身次级代理
     """
-    para_legal_list = ['LoginName', 'NickName', 'Margin', 'TestMargin', 'CommissionRatio', 'ExchangeRate',
-                       'MemberPrefix', 'MemberMaximum', 'Bank', 'BankAccount', 'Cardholder']
+    para_legal_list_recv = ['LoginName', 'NickName', 'Margin', 'TestMargin', 'CommissionRatio', 'ExchangeRate',
+                            'MemberPrefix', 'MemberMaximum', 'Bank', 'BankAccount', 'Cardholder']
 
     def __init__(self):
         super(ChangeAgentByID, self).__init__()
