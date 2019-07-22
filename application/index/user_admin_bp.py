@@ -94,14 +94,17 @@ class ChangeAdminByID(PermissionView):
         return super(ChangeAdminByID, self).dispatch_request(token_dict)
 
     def response_admin(self):
-        result = SmUserAdminService.update_by_id(self.admin_id, **self.unpack_para(request.json))
-        if result == 0:
-            return jsonify(SUCCESS())
-        elif result == 1:
-            return jsonify(DELETE_NOT_EXITS)
-        elif result == 2:
-            return jsonify(USER_SAME_LOGIN_NAME)
-        return jsonify(OTHER_ERROR)
+        try:
+            result = SmUserAdminService.update_by_id(self.admin_id, **self.unpack_para(request.json))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(DELETE_NOT_EXITS)
+            elif result == 2:
+                return jsonify(USER_SAME_LOGIN_NAME)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
 
 
 class DeleteAdminByID(PermissionView):
