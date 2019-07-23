@@ -7,6 +7,7 @@ from datetime import datetime as cdatetime     # 有时候会返回datatime类�
 from datetime import date, time
 from flask_sqlalchemy import Model
 from sqlalchemy import DateTime, Numeric, Date, Time    # 有时又是DateTime
+import decimal
 
 
 def query_to_dict(models):
@@ -123,18 +124,20 @@ def model_to_dict(model):      # 这段来自于参考资源
 
 def find_datetime(value):
     for v in value:
-        if isinstance(value[v], cdatetime):
+        if isinstance(value[v], cdatetime) or isinstance(value[v], decimal.Decimal):
             value[v] = convert_datetime(value[v])   # 这里原理类似，修改的字典对象，不用返回即可修改
 
 
 def convert_datetime(value):
-    if value:
+    if value is not None:
         if isinstance(value, (cdatetime, DateTime)):
             return value.strftime("%Y-%m-%d %H:%M:%S")
         elif isinstance(value, (date, Date)):
             return value.strftime("%Y-%m-%d")
         elif isinstance(value, (Time, time)):
             return value.strftime("%H:%M:%S")
+        elif isinstance(value, decimal.Decimal):
+            return float(value)
     else:
         return ""
 

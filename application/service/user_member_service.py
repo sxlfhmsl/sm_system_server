@@ -4,8 +4,9 @@
 """
 import datetime
 from flask import current_app
+from sqlalchemy.orm import aliased
 
-from ..dao.models import db, SmUserAgent, SmUserMember, SmUser
+from ..dao.models import db, SmUserAgent, SmUserMember, SmUser, SmClerk
 from .utils import BaseService
 
 
@@ -55,6 +56,10 @@ class SmUserMemberService(BaseService):
             if user:    # 存在相同登录名用户
                 return 1
             agent = SmUserAgent.query.filter(SmUserAgent.ID == para['AgentID']).first()
+            if para.get('ClerkID', None):
+                clerk = SmClerk.query.filter(SmClerk.ID == para['ClerkID']).first()
+                if clerk or clerk.AgentID != agent.ID:
+                    return 4
             if agent.MemberNum >= agent.MemberMaximum:
                 return 3
             cls.add_member_to_db(agent, CreatorID=admin_user.ID, Forbidden=0, Lock=0, CreateTime=date_time_now, RoleID=role['ID'], **para)
@@ -77,6 +82,10 @@ class SmUserMemberService(BaseService):
                  2                   可创建会员不足
                  3                   其他错误
         """
+        if para.get('ClerkID', None):
+            clerk = SmClerk.query.filter(SmClerk.ID == para['ClerkID']).first()
+            if clerk or clerk.AgentID != agent_user.ID:
+                return 4
         date_time_now = datetime.datetime.now()     # 获取当前时间
         para['Password'] = cls.sha256_generator(para['Password'])     # 修正密码
         para['WithdrawPassWord'] = cls.sha256_generator(para['WithdrawPassWord'])     # 修正提款密码
@@ -115,16 +124,78 @@ class SmUserMemberService(BaseService):
         return 0
 
     @classmethod
-    def query_member(cls, AgentID=None, LoginName=None, NickName=None, ClerkID=None, Page=None, PageSize=None):
+    def admin_query_member(cls, **params):
         """
-        查询所有符合条件的会员
-        :param AgentID: 所属代理ID，为空查询所有。
-        :param LoginName: 登录名模糊搜索
-        :param NickName: 客户姓名模糊搜索
-        :param ClerkID: 代理端查询（客户经理），实际为业务员id
-        :param Page: 分页页数
-        :param PageSize: 每页数量
-        :return:
+        管理员查询会员信息
+        :param params: 所有待使用参数
+        :return: 代码    返回结果            阐述
+                 0       分页查询结果        成功
+                 1       None                参数错误
+                 2       None                其他错误
         """
-        pass
+        query_filter_list = []
+        try:
+            # 提取必要参数
+            page = 1 if params.get('Page', None) is None or params.get('PageSize', None) is None else params.get('Page')
+            pagesize = 1000 if params.get('Page', None) is None or params.get('PageSize', None) is None else params.get('PageSize')
+            if params.get('AgentID', None) is not None:                                          # 待查询代理的id
+                query_filter_list.append(SmUserMember.AgentID == params['AgentID'])
+            if params.get('LoginName', None) is not None:                                        # 登录名模糊
+                query_filter_list.append(SmUserMember.LoginName.like('%' + params['LoginName'] + '%'))
+            if params.get('NickName', None) is not None:                                         # 客户名模糊
+                query_filter_list.append(SmUserMember.NickName.like('%' + params['NickName'] + '%'))
+            table_user = aliased(SmUser)     # 查询代理登录名
+            table_clerk = aliased(SmClerk)    # 业务员账号
+            page_result = db.session.query(
+                SmUserMember,
+                table_user.LoginName.label('AgentName'),
+                table_clerk.NickName.label('ClerkName')
+            ).\
+                outerjoin(table_user, table_user.ID == SmUserMember.AgentID).\
+                outerjoin(table_clerk, table_clerk.ID == SmUserMember.ClerkID).\
+                filter(*query_filter_list).order_by(SmUserMember.CreateTime.desc()).paginate(page, pagesize)
+            return 0, {"total": page_result.total, "rows": cls.result_to_dict(page_result.items)}
+        except Exception as e:
+            current_app.logger.error(e)
+            return 1, None
+        return 2, None
+
+    @classmethod
+    def agent_query_member(cls, agent_user, **params):
+        """
+        代理查询会员信息
+        :param agent_user: 代理用户
+        :param params: 相关参数
+        :return: 代码    返回结果            阐述
+                 0       分页查询结果        成功
+                 1       None                参数错误
+                 2       None                其他错误
+        """
+        query_filter_list = []
+        try:
+            # 提取必要参数
+            page = 1 if params.get('Page', None) is None or params.get('PageSize', None) is None else params.get('Page')
+            pagesize = 1000 if params.get('Page', None) is None or params.get('PageSize', None) is None else params.get('PageSize')                                      # 待查询代理的id
+            query_filter_list.append(SmUserMember.AgentID == agent_user.ID)
+            if params.get('ClerkID', None) is not None:                                        # 业务员
+                query_filter_list.append(SmUserMember.ClerkID == params['ClerkID'])
+            if params.get('LoginName', None) is not None:                                        # 登录名模糊
+                query_filter_list.append(SmUserMember.LoginName.like('%' + params['LoginName'] + '%'))
+            if params.get('NickName', None) is not None:                                         # 客户名模糊
+                query_filter_list.append(SmUserMember.NickName.like('%' + params['NickName'] + '%'))
+            table_user = aliased(SmUser)     # 查询代理登录名
+            table_clerk = aliased(SmClerk)    # 业务员账号
+            page_result = db.session.query(
+                SmUserMember,
+                table_user.LoginName.label('AgentName'),
+                table_clerk.NickName.label('ClerkName')
+            ). \
+                outerjoin(table_user, table_user.ID == SmUserMember.AgentID). \
+                outerjoin(table_clerk, table_clerk.ID == SmUserMember.ClerkID). \
+                filter(*query_filter_list).order_by(SmUserMember.CreateTime.desc()).paginate(page, pagesize)
+            return 0, {"total": page_result.total, "rows": cls.result_to_dict(page_result.items)}
+        except Exception as e:
+            current_app.logger.error(e)
+            return 1, None
+        return 2, None
 

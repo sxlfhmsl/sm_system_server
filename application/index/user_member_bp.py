@@ -34,6 +34,8 @@ class CreateMember(PermissionView):
                 return jsonify(OTHER_ERROR)
             elif result == 3:
                 return jsonify(USER_AGENT_NOT_ENOUGH_MEMBER)
+            elif result == 4:
+                return jsonify(POST_PARA_ERROR)
         except Exception as e:
             current_app.logger.error(e)
             return jsonify(POST_PARA_ERROR)
@@ -50,6 +52,8 @@ class CreateMember(PermissionView):
                 return jsonify(USER_AGENT_NOT_ENOUGH_MEMBER)
             elif result == 3:
                 return jsonify(OTHER_ERROR)
+            elif result == 4:
+                return jsonify(POST_PARA_ERROR)
         except Exception as e:
             current_app.logger.error(e)
             return jsonify(POST_PARA_ERROR)
@@ -60,16 +64,31 @@ class QueryAllMember(PermissionView):
     """
     查询所有的会员
     """
-    para_legal_list_recv = ['AgentID', 'LoginName', 'NickName']
-    para_legal_list_return = ['Password', 'CreatorID', 'RoleID', 'WithdrawPassWord', 'Cardholder', 'BankAccount', 'Bank']
+    para_legal_list_recv = ['AgentID', 'LoginName', 'NickName', 'Page', 'PageSize', 'ClerkID']
+    para_legal_list_return = ['Password', 'CreatorID', 'RoleID', 'WithdrawPassWord', 'Cardholder', 'Bank', 'BuyFeeRate'
+                              'SellFeeRate', 'RiseFallSpreadRate', 'OpeningBank', 'Type', 'AgentID', 'ClerkID']
 
     def response_admin(self):
         try:
-            code, data = SmUserMemberService.query_admin(**request.json)
+            code, data = SmUserMemberService.admin_query_member(**self.unpack_para(request.json))
             if code == 0:
+                self.pop_no_need(data['rows'])
                 return jsonify(SUCCESS(data))
             elif code == 1:
-                return jsonify(OTHER_ERROR)
+                return jsonify(POST_PARA_ERROR)
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
+
+    def response_agent(self):
+        try:
+            code, data = SmUserMemberService.agent_query_member(self.user, **self.unpack_para(request.json))
+            if code == 0:
+                self.pop_no_need(data['rows'])
+                return jsonify(SUCCESS(data))
+            elif code == 1:
+                return jsonify(POST_PARA_ERROR)
         except Exception as e:    # 参数解析错误
             current_app.logger.error(e)
             return jsonify(POST_PARA_ERROR)
