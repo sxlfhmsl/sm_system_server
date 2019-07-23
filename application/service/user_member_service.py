@@ -200,7 +200,7 @@ class SmUserMemberService(BaseService):
         return 2, None
 
     @classmethod
-    def admin_query_by_id(cls, member_id):
+    def get_by_id(cls, member_id):
         """
         管理员通过id查询会员
         :param member_id: 会员id
@@ -235,7 +235,7 @@ class SmUserMemberService(BaseService):
         :param member_id: 会员id
         :return:
         """
-        result = cls.admin_query_by_id(member_id)
+        result = cls.get_by_id(member_id)
         if not result or result['AgentID'] != agent_user.ID:
             return None
         return result

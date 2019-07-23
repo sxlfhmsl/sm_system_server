@@ -110,7 +110,7 @@ class QueryMemberByID(PermissionView):
         return super(QueryMemberByID, self).dispatch_request(token_dict)
 
     def response_admin(self):
-        result = SmUserMemberService.admin_query_by_id(self.member_id)
+        result = SmUserMemberService.get_by_id(self.member_id)
         if result:
             self.pop_no_need(result)
             return jsonify(SUCCESS(result))
