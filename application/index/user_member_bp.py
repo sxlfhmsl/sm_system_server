@@ -7,7 +7,7 @@ from flask.blueprints import Blueprint
 from flask import jsonify, abort, current_app, request
 
 from .utils import PermissionView
-from .sta_code import SUCCESS, USER_SAME_LOGIN_NAME, OTHER_ERROR, POST_PARA_ERROR, USER_AGENT_NOT_ENOUGH_MEMBER
+from .sta_code import SUCCESS, USER_SAME_LOGIN_NAME, OTHER_ERROR, POST_PARA_ERROR, USER_AGENT_NOT_ENOUGH_MEMBER, QUERY_NO_RESULT
 from ..service.user_member_service import SmUserMemberService
 
 
@@ -95,6 +95,39 @@ class QueryAllMember(PermissionView):
         return jsonify(OTHER_ERROR)
 
 
+class QueryMemberByID(PermissionView):
+    """
+    查询指定id的会员
+    """
+    para_legal_list_return = ['Password', 'CreatorID', 'RoleID', 'WithdrawPassWord']
+
+    def __init__(self):
+        super(QueryMemberByID, self).__init__()
+        self.member_id = None    # 带查询的代理id
+
+    def dispatch_request(self, token_dict: dict, member_id):
+        self.member_id = member_id
+        return super(QueryMemberByID, self).dispatch_request(token_dict)
+
+    def response_admin(self):
+        result = SmUserMemberService.admin_query_by_id(self.member_id)
+        if result:
+            self.pop_no_need(result)
+            return jsonify(SUCCESS(result))
+        else:
+            return jsonify(QUERY_NO_RESULT)
+
+    def response_agent(self):
+        result = SmUserMemberService.agent_query_by_id(self.user, self.member_id)
+        if result:
+            self.pop_no_need(result)
+            return jsonify(SUCCESS(result))
+        else:
+            return jsonify(QUERY_NO_RESULT)
+
+
 user_member_bp.add_url_rule('/create', methods=['POST'], view_func=CreateMember.as_view('create_member'))
 user_member_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllMember.as_view('all_member'))
+# 查询单个会员，通过id
+user_member_bp.add_url_rule('/query/<member_id>', methods=['POST'], view_func=QueryMemberByID.as_view('query_member_by_id'))
 

@@ -199,3 +199,44 @@ class SmUserMemberService(BaseService):
             return 1, None
         return 2, None
 
+    @classmethod
+    def admin_query_by_id(cls, member_id):
+        """
+        管理员通过id查询会员
+        :param member_id: 会员id
+        :return:
+        """
+        try:
+            table_user = aliased(SmUser)     # 查询代理登录名
+            table_creator = aliased(SmUser)    # 创建者信息
+            table_clerk = aliased(SmClerk)    # 业务员账号
+            result = db.session.query(
+                SmUserMember,
+                table_user.LoginName.label('AgentName'),
+                table_clerk.NickName.label('ClerkName'),
+                table_creator.RoleID.label('CreatorRoleID')
+            ). \
+                outerjoin(table_user, table_user.ID == SmUserMember.AgentID). \
+                outerjoin(table_clerk, table_clerk.ID == SmUserMember.ClerkID). \
+                outerjoin(table_creator, table_creator.ID == SmUserMember.CreatorID).\
+                filter(SmUserMember.ID == member_id).first()
+            result = cls.result_to_dict(result)
+            result['CreatorType'] = 'Admin' if result['CreatorRoleID'] == cls.get_role('Admin')['ID'] else 'Agent'
+            return result
+        except Exception as e:
+            current_app.logger.error(e)
+            return None
+
+    @classmethod
+    def agent_query_by_id(cls, agent_user, member_id):
+        """
+        管理员通过id查询会员
+        :param agent_user: 代理
+        :param member_id: 会员id
+        :return:
+        """
+        result = cls.admin_query_by_id(member_id)
+        if not result or result['AgentID'] != agent_user.ID:
+            return None
+        return result
+
