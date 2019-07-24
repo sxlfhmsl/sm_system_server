@@ -240,3 +240,49 @@ class SmUserMemberService(BaseService):
             return None
         return result
 
+    @classmethod
+    def update_by_id(cls, m_id, **para):
+        """
+        通过id更新会员, 后期确定明确买入手续费，卖出手续费，涨跌点差率等变化规则，再做出相应的限制，代理相同
+        :param m_id: 待修改会员的id
+        :param para: 待修改代理的参数
+        :return: 代码    返回结果
+                 0       修改完成
+                 1       登录名重名
+                 2       参数错误
+        """
+        try:
+            member = SmUserMember.query.filter(SmUserMember.ID == m_id).first()
+            clerk = SmClerk.query.filter(SmClerk.ID == para.get('ClerkID', None)).first()
+            if not member or (para.get('ClerkID', None) and not clerk) or (clerk and member.AgentID != clerk.AgentID):     # 判断是否为同一代理之下
+                return 2
+            result = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()     # 确定是否存在重名
+            if result and result.ID != m_id:
+                return 1
+            # 确定买入手续费，卖出手续费，涨跌点差率变化规律
+            return super(SmUserMemberService, cls).update_by_id(m_id, **para)
+        except Exception as e:
+            current_app.logger.error(e)
+            return 2
+        return 0
+
+    @classmethod
+    def agent_update_by_id(cls, agent_user, m_id,  **para):
+        """
+        代理修改自己的会员信息
+        :param agent_user: 代理用户
+        :param m_id: 目标id
+        :param para: 更新参数
+        :return: 代码    返回结果
+                 0       修改完成
+                 1       登录名重名
+                 2       参数错误
+        """
+        member = SmUserMember.query.filter(SmUserMember.ID == m_id).first()
+        if member.AgentID != agent_user.ID:
+            return 2
+        return cls.update_by_id(m_id, **para)
+
+
+
+

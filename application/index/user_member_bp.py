@@ -126,8 +126,56 @@ class QueryMemberByID(PermissionView):
             return jsonify(QUERY_NO_RESULT)
 
 
+class ChangeMemberByID(PermissionView):
+    """
+    通过id更新代理信息， 管理员可以任意修改，代理只可修改自身次级代理
+    """
+    para_legal_list_recv = ['LoginName', 'ClerkID', 'NickName', 'Margin', 'BuyFeeRate', 'SellFeeRate', 'OpeningBank',
+                            'RiseFallSpreadRate', 'Bank', 'BankAccount', 'Cardholder',  'PhoneNum', 'EmailAddress', 'QQNum']
+
+    def __init__(self):
+        super(ChangeMemberByID, self).__init__()
+        self.member_id = None    # 带查询的代理id
+
+    def dispatch_request(self, token_dict: dict, member_id):
+        self.member_id = member_id
+        return super(ChangeMemberByID, self).dispatch_request(token_dict)
+
+    def response_admin(self):
+        try:
+            result = SmUserMemberService.update_by_id(self.member_id, **self.unpack_para(request.json))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(USER_SAME_LOGIN_NAME)
+            elif result == 2:
+                return jsonify(POST_PARA_ERROR)
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
+
+    def response_agent(self):
+        try:
+            result = SmUserMemberService.agent_update_by_id(self.user, self.member_id, **self.unpack_para(request.json))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(USER_SAME_LOGIN_NAME)
+            elif result == 2:
+                return jsonify(POST_PARA_ERROR)
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
+
+
+# 创建会员
 user_member_bp.add_url_rule('/create', methods=['POST'], view_func=CreateMember.as_view('create_member'))
+# 查询所有会员
 user_member_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllMember.as_view('all_member'))
 # 查询单个会员，通过id
 user_member_bp.add_url_rule('/query/<member_id>', methods=['POST'], view_func=QueryMemberByID.as_view('query_member_by_id'))
+# 通过id修改会员
+user_member_bp.add_url_rule('/update/<member_id>', methods=['POST'], view_func=ChangeMemberByID.as_view('update_member_by_id'))
 
