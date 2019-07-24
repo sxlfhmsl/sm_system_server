@@ -74,6 +74,7 @@ def reg_blueprint(app):
     from .index.user_agent_bp import user_agent_bp
     from .index.user_member_bp import user_member_bp
     from .index.exception_bp import exception_bp
+    from .index.clerk_bp import clerk_bp
 
     # 用户相关蓝图接口
     app.register_blueprint(user_bp, url_prefix='/user')
@@ -83,6 +84,8 @@ def reg_blueprint(app):
     app.register_blueprint(user_agent_bp, url_prefix='/user/agent')
     # 会员相关接口
     app.register_blueprint(user_member_bp, url_prefix='/user/member')
+    # 业务员相关接口
+    app.register_blueprint(clerk_bp, url_prefix='/clerk')
     # 异常拦截
     app.register_blueprint(exception_bp, url_prefix='/exception')
 
