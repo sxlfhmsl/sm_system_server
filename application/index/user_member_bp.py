@@ -170,6 +170,31 @@ class ChangeMemberByID(PermissionView):
         return jsonify(OTHER_ERROR)
 
 
+class DeleteMemberByID(PermissionView):
+
+    def __init__(self):
+        super(DeleteMemberByID, self).__init__()
+        self.member_id = None    # 带查询的管理员id
+
+    def dispatch_request(self, token_dict: dict, member_id):
+        self.member_id = member_id
+        return super(DeleteMemberByID, self).dispatch_request(token_dict)
+
+    def response_admin(self):
+        try:
+            result = SmUserMemberService.admin_delete_by_id(self.member_id)
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(QUERY_NO_RESULT)
+            elif result == 2:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
+            return jsonify(OTHER_ERROR)
+        return jsonify(OTHER_ERROR)
+
+
 # 创建会员
 user_member_bp.add_url_rule('/create', methods=['POST'], view_func=CreateMember.as_view('create_member'))
 # 查询所有会员
@@ -178,4 +203,6 @@ user_member_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllMember.a
 user_member_bp.add_url_rule('/query/<member_id>', methods=['POST'], view_func=QueryMemberByID.as_view('query_member_by_id'))
 # 通过id修改会员
 user_member_bp.add_url_rule('/update/<member_id>', methods=['POST'], view_func=ChangeMemberByID.as_view('update_member_by_id'))
+# 通过id删除会员
+user_member_bp.add_url_rule('/delete/<member_id>', methods=['POST'], view_func=DeleteMemberByID.as_view('delete_member_by_id'))
 

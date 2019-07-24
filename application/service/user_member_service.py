@@ -283,6 +283,30 @@ class SmUserMemberService(BaseService):
             return 2
         return cls.update_by_id(m_id, **para)
 
-
-
+    @classmethod
+    def admin_delete_by_id(cls, s_id):
+        """
+        管理员通过id删除会员-----后期需加入资金处理等目标，如计算盈收等
+        用户存在持仓情况下是否允许删除-----删除后操作
+        :param s_id: 待处理会员id
+        :return: 代码    返回结果
+                 0       修改完成
+                 1       查询不到结果
+                 2       其他错误
+        """
+        try:
+            target = SmUserMember.query.filter(SmUserMember.ID == s_id).first()     # 获取欲删除目标
+            if target is None:
+                return 1
+            agent_id = target.AgentID
+            if super(SmUserMemberService, cls).delete_by_id(s_id) == 1:     # 删除失败
+                return 2
+            agent = SmUserAgent.query.filter(SmUserAgent.ID == agent_id).first()
+            if agent and agent.MemberNum > 0:
+                agent.MemberNum -= 1
+                db.session.commit()
+        except Exception as e:
+            current_app.logger.error(e)
+            return 2
+        return 0
 
