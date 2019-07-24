@@ -124,6 +124,25 @@ class SmUserMemberService(BaseService):
         return 0
 
     @classmethod
+    def reset_withdraw_pass(cls, member_id, new_pass):
+        """"
+        重置提款密码
+        :param member_id: 会员id
+        :param new_pass: 新密码
+        :return: 执行结果    0: 执行成功， 1: 查询失败    2: 其他错误
+        """
+        try:
+            member = SmUserMember.query.filter(SmUserMember.ID == member_id).first()
+            if not member:
+                return 1
+            member.WithdrawPassWord = cls.sha256_generator(new_pass)
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.error(e)
+            return 2
+        return 0
+
+    @classmethod
     def admin_query_member(cls, **params):
         """
         管理员查询会员信息

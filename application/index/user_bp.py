@@ -105,7 +105,7 @@ class UserChangePassView(PermissionView):
         try:
             result = None
             if request.json.get('Type', None) == 2:
-                result = SmUserAdminService.change_withdraw_pass(self.user, request.json.get('Old', None), request.json.get('New', None))
+                result = SmUserAgentService.change_withdraw_pass(self.user, request.json.get('Old', None), request.json.get('New', None))
             else:
                 result = SmUserService.change_login_pass(self.user, request.json.get('Old', None), request.json.get('New', None))
             if result == 0:
@@ -165,9 +165,48 @@ class UserChangeFlagView(PermissionView):
         return jsonify(OTHER_ERROR)
 
 
+class UserResetPassView(PermissionView):
+    para_legal_list_recv = ['Type', 'Password', 'WithdrawPassWord']
+
+    def __init__(self):
+        super(UserResetPassView, self).__init__()
+        self.user_id = None    # 带查询的管理员id
+
+    def dispatch_request(self, token_dict: dict, user_id):
+        self.user_id = user_id
+        return super(UserResetPassView, self).dispatch_request(token_dict)
+
+    def response_admin(self):
+        try:
+            result = 0
+            params = self.unpack_para(request.json)
+            if params.get('Password', None) is not None:
+                result = SmUserService.reset_login_pass(self.user_id, params['Password'])
+            elif params.get('WithdrawPassWord', None) is not None:
+                if params['Type'] == 'agent':
+                    result = SmUserAgentService.reset_withdraw_pass(self.user_id, params['WithdrawPassWord'])
+                elif params['Type'] == 'member':
+                    result = SmUserMemberService.reset_withdraw_pass(self.user_id, params['WithdrawPassWord'])
+                else:
+                    return jsonify(POST_PARA_ERROR)
+            else:
+                return jsonify(POST_PARA_ERROR)
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(QUERY_NO_RESULT)
+            elif result == 2:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+        return jsonify(OTHER_ERROR)
+
+
 user_bp.add_url_rule('/login', methods=['POST'], view_func=UserLoginView.as_view('user_login'))
 user_bp.add_url_rule('/logout', methods=['POST'], view_func=UserLogoutView.as_view('user_logout'))
 user_bp.add_url_rule('/info', methods=['POST'], view_func=UserInfoView.as_view('user_info'))
 user_bp.add_url_rule('/change_pass', methods=['POST'], view_func=UserChangePassView.as_view('user_change_pass'))
+user_bp.add_url_rule('/reset_pass/<user_id>', methods=['POST'], view_func=UserResetPassView.as_view('user_reset_pass'))
 user_bp.add_url_rule('/change_flag/<user_id>', methods=['POST'], view_func=UserChangeFlagView.as_view('user_change_flag_by_id'))
 

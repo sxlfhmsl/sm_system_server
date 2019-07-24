@@ -258,6 +258,25 @@ class SmUserAgentService(BaseService):
         return 0
 
     @classmethod
+    def reset_withdraw_pass(cls, agent_id, new_pass):
+        """"
+        重置提款密码
+        :param agent_id: 代理id
+        :param new_pass: 新密码
+        :return: 执行结果    0: 执行成功， 1: 查询失败    2: 其他错误
+        """
+        try:
+            agent = SmUserAgent.query.filter(SmUserAgent.ID == agent_id).first()
+            if not agent:
+                return 1
+            agent.WithdrawPassWord = cls.sha256_generator(new_pass)
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.error(e)
+            return 2
+        return 0
+
+    @classmethod
     def admin_delete_by_id(cls, m_id):
         """
         管理员删除代理，通过id

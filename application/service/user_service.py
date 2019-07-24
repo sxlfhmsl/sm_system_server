@@ -97,6 +97,25 @@ class SmUserService(BaseService):
         return 0
 
     @classmethod
+    def reset_login_pass(cls, user_id, new_pass):
+        """
+        重置登录密码
+        :param user_id: 目标用户
+        :param new_pass: 新密码
+        :return: 执行结果    0: 执行成功， 1: 用户不存在    2: 其他错误
+        """
+        try:
+            user = SmUser.query.filter(SmUser.ID == user_id).first()
+            if not user:
+                return 1
+            user.Password = cls.sha256_generator(new_pass)
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.error(e)
+            return 2
+        return 0
+
+    @classmethod
     def change_user_flag(cls, user_id, **flag):
         """
         通过id，修改账号状态，锁定，禁用等
