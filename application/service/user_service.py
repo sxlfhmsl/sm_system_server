@@ -96,3 +96,34 @@ class SmUserService(BaseService):
             return 2
         return 0
 
+    @classmethod
+    def change_user_flag(cls, user_id, **flag):
+        """
+        通过id，修改账号状态，锁定，禁用等
+        :param user_id: 用户id
+        :param flag: 相关状态
+        :return: 代码    返回结果
+                 0       修改完成
+                 1       查询不到结果
+                 2       其他错误
+        """
+        try:
+            target = SmUser.query.filter(SmUser.ID == user_id).first()
+            if not target:
+                return 1
+            if flag.get('Forbidden', None) is not None:
+                if flag['Forbidden']:
+                    target.Forbidden = 1
+                else:
+                    target.Forbidden = 0
+            if flag.get('Lock', None) is not None:
+                if flag['Lock']:
+                    target.Lock = 6
+                else:
+                    target.Lock = 0
+            db.session.commit()
+        except Exception as e:
+            current_app.logger.error(e)
+            return 2
+        return 0
+

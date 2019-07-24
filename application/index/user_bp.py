@@ -7,7 +7,7 @@ from flask import request, jsonify, abort, current_app
 
 from .utils import BaseView, PermissionView
 from .sta_code import SUCCESS, USER_NAME_PASS_WRONG_ERROR, USER_FORBIDDEN_ERROR, USER_LOCK_ERROR, OTHER_ERROR
-from .sta_code import PERMISSION_DENIED_ERROR, POST_PARA_ERROR
+from .sta_code import PERMISSION_DENIED_ERROR, POST_PARA_ERROR, QUERY_NO_RESULT
 from .sta_code import USER_WRONG_PASS
 from ..service.user_service import SmUserService
 from ..service.user_admin_service import SmUserAdminService
@@ -136,8 +136,38 @@ class UserChangePassView(PermissionView):
             return jsonify(POST_PARA_ERROR)
 
 
+class UserChangeFlagView(PermissionView):
+    """
+    修改账号状态，禁用或启用，或者解锁，锁定
+    """
+    para_legal_list_recv = ['Forbidden', 'Lock']
+
+    def __init__(self):
+        super(UserChangeFlagView, self).__init__()
+        self.user_id = None    # 带查询的管理员id
+
+    def dispatch_request(self, token_dict: dict, user_id):
+        self.user_id = user_id
+        return super(UserChangeFlagView, self).dispatch_request(token_dict)
+
+    def response_admin(self):
+        try:
+            result = SmUserService.change_user_flag(self.user_id, **self.unpack_para(request.json))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(QUERY_NO_RESULT)
+            elif result == 2:
+                return jsonify(OTHER_ERROR)
+        except Exception as e:    # 参数解析错误
+            current_app.logger.error(e)
+            return jsonify(OTHER_ERROR)
+        return jsonify(OTHER_ERROR)
+
+
 user_bp.add_url_rule('/login', methods=['POST'], view_func=UserLoginView.as_view('user_login'))
 user_bp.add_url_rule('/logout', methods=['POST'], view_func=UserLogoutView.as_view('user_logout'))
 user_bp.add_url_rule('/info', methods=['POST'], view_func=UserInfoView.as_view('user_info'))
 user_bp.add_url_rule('/change_pass', methods=['POST'], view_func=UserChangePassView.as_view('user_change_pass'))
+user_bp.add_url_rule('/change_flag/<user_id>', methods=['POST'], view_func=UserChangeFlagView.as_view('user_change_flag_by_id'))
 
