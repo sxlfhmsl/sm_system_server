@@ -4,7 +4,7 @@
 """
 
 from flask.blueprints import Blueprint
-from flask import jsonify, abort, current_app, request
+from flask import jsonify, current_app, request
 
 from .utils import PermissionView
 from .sta_code import SUCCESS, USER_SAME_LOGIN_NAME, OTHER_ERROR, POST_PARA_ERROR, USER_AGENT_LEVEL_LOW, QUERY_NO_RESULT

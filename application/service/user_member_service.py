@@ -175,7 +175,6 @@ class SmUserMemberService(BaseService):
         except Exception as e:
             current_app.logger.error(e)
             return 1, None
-        return 2, None
 
     @classmethod
     def agent_query_member(cls, agent_user, **params):
@@ -214,7 +213,6 @@ class SmUserMemberService(BaseService):
         except Exception as e:
             current_app.logger.error(e)
             return 1, None
-        return 2, None
 
     @classmethod
     def get_by_id(cls, member_id):
@@ -253,9 +251,7 @@ class SmUserMemberService(BaseService):
         :return:
         """
         result = cls.get_by_id(member_id)
-        if not result or result['AgentID'] != agent_user.ID:
-            return None
-        return result
+        return None if not result or result['AgentID'] != agent_user.ID else result
 
     @classmethod
     def update_by_id(cls, m_id, **para):
@@ -271,7 +267,8 @@ class SmUserMemberService(BaseService):
         try:
             member = SmUserMember.query.filter(SmUserMember.ID == m_id).first()
             clerk = SmClerk.query.filter(SmClerk.ID == para.get('ClerkID', None)).first()
-            if not member or (para.get('ClerkID', None) and not clerk) or (clerk and member.AgentID != clerk.AgentID):     # 判断是否为同一代理之下
+            # 判断是否为同一代理之下
+            if not member or (para.get('ClerkID', None) and not clerk) or (clerk and member.AgentID != clerk.AgentID):
                 return 2
             result = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()     # 确定是否存在重名
             if result and result.ID != m_id:
@@ -281,7 +278,6 @@ class SmUserMemberService(BaseService):
         except Exception as e:
             current_app.logger.error(e)
             return 2
-        return 0
 
     @classmethod
     def agent_update_by_id(cls, agent_user, m_id,  **para):
@@ -313,8 +309,6 @@ class SmUserMemberService(BaseService):
         """
         try:
             target = SmUserMember.query.filter(SmUserMember.ID == s_id).first()     # 获取欲删除目标
-            if target is None:
-                return 1
             agent_id = target.AgentID
             if super(SmUserMemberService, cls).delete_by_id(s_id) == 1:     # 删除失败
                 return 2
@@ -324,6 +318,6 @@ class SmUserMemberService(BaseService):
                 db.session.commit()
         except Exception as e:
             current_app.logger.error(e)
-            return 2
+            return 1
         return 0
 

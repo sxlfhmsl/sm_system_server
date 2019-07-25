@@ -5,9 +5,8 @@
 import datetime
 from flask import current_app
 from sqlalchemy.orm import aliased
-from sqlalchemy import and_, func
 
-from ..dao.models import db, SmUser, SmUserAgent, SmUserMember
+from ..dao.models import db, SmUser, SmUserAgent
 from .utils import BaseService
 
 
