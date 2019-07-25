@@ -137,8 +137,12 @@ class QueryAllView(PermissionView):
     para_legal_list_return = ['Forbidden']
 
     def response_admin(self):
+        """
+        传入AgentID时查询指定代理下的业务员
+        :return:
+        """
         try:
-            result = SmClerkService.query_all(**self.unpack_para(request.json))
+            result = SmClerkService.query_all(agent_id=request.json.get('AgentID', None), **self.unpack_para(request.json))
             self.pop_no_need(result['rows'])
             return jsonify(SUCCESS(result))
         except Exception as e:
