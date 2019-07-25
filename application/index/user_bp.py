@@ -157,11 +157,9 @@ class UserChangeFlagView(PermissionView):
                 return jsonify(SUCCESS())
             elif result == 1:
                 return jsonify(QUERY_NO_RESULT)
-            elif result == 2:
-                return jsonify(OTHER_ERROR)
         except Exception as e:    # 参数解析错误
             current_app.logger.error(e)
-            return jsonify(OTHER_ERROR)
+            return jsonify(POST_PARA_ERROR)
         return jsonify(OTHER_ERROR)
 
 
