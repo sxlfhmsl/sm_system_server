@@ -133,13 +133,11 @@ class SmUserMemberService(BaseService):
         """
         try:
             member = SmUserMember.query.filter(SmUserMember.ID == member_id).first()
-            if not member:
-                return 1
             member.WithdrawPassWord = cls.sha256_generator(new_pass)
             db.session.commit()
         except Exception as e:
             current_app.logger.error(e)
-            return 2
+            return 1
         return 0
 
     @classmethod

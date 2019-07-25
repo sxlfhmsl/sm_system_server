@@ -267,13 +267,11 @@ class SmUserAgentService(BaseService):
         """
         try:
             agent = SmUserAgent.query.filter(SmUserAgent.ID == agent_id).first()
-            if not agent:
-                return 1
             agent.WithdrawPassWord = cls.sha256_generator(new_pass)
             db.session.commit()
         except Exception as e:
             current_app.logger.error(e)
-            return 2
+            return 1
         return 0
 
     @classmethod

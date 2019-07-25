@@ -106,13 +106,11 @@ class SmUserService(BaseService):
         """
         try:
             user = SmUser.query.filter(SmUser.ID == user_id).first()
-            if not user:
-                return 1
             user.Password = cls.sha256_generator(new_pass)
             db.session.commit()
         except Exception as e:
             current_app.logger.error(e)
-            return 2
+            return 1
         return 0
 
     @classmethod
