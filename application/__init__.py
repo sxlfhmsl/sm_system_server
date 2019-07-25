@@ -9,6 +9,7 @@ import pymysql
 
 from .dao.utils import flask_redis
 from .dao.models import db
+from .dao.utils import RedisOp
 
 pymysql.install_as_MySQLdb()
 
@@ -43,6 +44,9 @@ def create_app(test_config=None):
     # 添加蓝图
     reg_blueprint(app)
 
+    # 初始化redis
+    init_redis_value()
+
     # a simple page that says hello
     @app.route('/hello')
     def hello():
@@ -75,6 +79,7 @@ def reg_blueprint(app):
     from .index.user_member_bp import user_member_bp
     from .index.exception_bp import exception_bp
     from .index.clerk_bp import clerk_bp
+    from .index.system_bp import system_bp
 
     # 用户相关蓝图接口
     app.register_blueprint(user_bp, url_prefix='/user')
@@ -86,6 +91,23 @@ def reg_blueprint(app):
     app.register_blueprint(user_member_bp, url_prefix='/user/member')
     # 业务员相关接口
     app.register_blueprint(clerk_bp, url_prefix='/clerk')
+    # 系统相关接口
+    app.register_blueprint(system_bp, url_prefix='/system')
     # 异常拦截
     app.register_blueprint(exception_bp, url_prefix='/exception')
 
+
+def init_redis_value():
+    """
+    初始化redis中的值
+    :return:
+    """
+    path = os.getcwd() + '\\application\\static\\'
+    # 设置交易规则标题
+    file = open(path + 'trade_role_title', encoding='utf8')
+    RedisOp().set_normal('system_trade_role_title', file.read())
+    file.close()
+    # 设置交易规则内容
+    file = open(path + 'trade_role_content', encoding='utf8')
+    RedisOp().set_normal('system_trade_role_content', file.read())
+    file.close()
