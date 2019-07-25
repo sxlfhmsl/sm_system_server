@@ -46,6 +46,7 @@ class SmUserAgentService(BaseService):
         """
         date_time_now = datetime.datetime.now()
         para['Password'] = cls.sha256_generator(para['Password'])
+        para['WithdrawPassWord'] = cls.sha256_generator(para['WithdrawPassWord'])
         role = cls.get_role('Agent')
         try:
             user = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
@@ -74,6 +75,7 @@ class SmUserAgentService(BaseService):
         """
         date_time_now = datetime.datetime.now()
         para['Password'] = cls.sha256_generator(para['Password'])
+        para['WithdrawPassWord'] = cls.sha256_generator(para['WithdrawPassWord'])
         role = cls.get_role('Agent')
         try:
             user = SmUser.query.filter(SmUser.LoginName == para['LoginName']).first()
@@ -203,7 +205,6 @@ class SmUserAgentService(BaseService):
         except Exception as e:
             current_app.logger.error(e)
             return 3
-        return 0
 
     @classmethod
     def agent_update_by_id(cls, agent_user, s_id, **para):
@@ -235,7 +236,6 @@ class SmUserAgentService(BaseService):
         except Exception as e:
             current_app.logger.error(e)
             return 4
-        return 0
 
     @classmethod
     def change_withdraw_pass(cls, user, old_pass, new_pass):
@@ -291,11 +291,10 @@ class SmUserAgentService(BaseService):
             if target.AgentLevel != 1:     # 归还会员数量
                 creator = SmUserAgent.query.filter(SmUserAgent.ID == target.CreatorID).with_for_update().first()
                 creator.MemberNum = creator.MemberNum - target.MemberMaximum
-            super(SmUserAgentService, cls).delete_by_id(m_id)
+            return super(SmUserAgentService, cls).delete_by_id(m_id)
         except Exception as e:
             current_app.logger.error(e)
             return 2
-        return 0
 
     @classmethod
     def agent_delete_by_id(cls, agent_user,  m_id):
@@ -313,12 +312,10 @@ class SmUserAgentService(BaseService):
             target = SmUserAgent.query.filter(SmUserAgent.ID == m_id).first()     # 获取欲删除目标
             if agent_user.ID != target.CreatorID:
                 return 1
-            if target is None or target.MemberNum != 0:
+            if target.MemberNum != 0:
                 return 2
             agent_user.MemberNum = agent_user.MemberNum - target.MemberMaximum
-            super(SmUserAgentService, cls).delete_by_id(m_id)
+            return super(SmUserAgentService, cls).delete_by_id(m_id)
         except Exception as e:
             current_app.logger.error(e)
             return 3
-        return 0
-
