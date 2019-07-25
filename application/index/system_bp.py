@@ -7,6 +7,7 @@ from flask.blueprints import Blueprint
 from flask import jsonify, request, current_app
 
 from ..service.system_service import SystemService
+from ..service.sys_notice_service import SmSysNoticeService
 from .utils import PermissionView
 from .sta_code import SUCCESS, OTHER_ERROR, POST_PARA_ERROR
 
@@ -49,8 +50,32 @@ class SetTradeRole(PermissionView):
             return jsonify(POST_PARA_ERROR)
 
 
+class QueryAllNotice(PermissionView):
+    """
+    获取所有可用公告
+    """
+    para_legal_list_recv = ['Page', 'PageSize']
+    para_legal_list_return = ['AgentDisable', 'MemberDisable']
+
+    def response_admin(self):
+        result = SmSysNoticeService.query_all_notice(**self.unpack_para(request.json))
+        return jsonify(SUCCESS(result))
+
+    def response_agent(self):
+        result = SmSysNoticeService.query_all_notice(user_type='agent', **self.unpack_para(request.json))
+        self.pop_no_need(result['rows'])
+        return jsonify(SUCCESS(result))
+
+    def response_member(self):
+        result = SmSysNoticeService.query_all_notice(user_type='member')
+        self.pop_no_need(result['rows'])
+        return jsonify(SUCCESS(result['rows']))
+
+
 # 获取交易规则
 system_bp.add_url_rule('/traderole', methods=['POST'], view_func=QueryTradeRole.as_view('system_traderole'))
 # 设置交易规则
 system_bp.add_url_rule('/set_traderole', methods=['POST'], view_func=SetTradeRole.as_view('system_set_traderole'))
+# 设置交易规则
+system_bp.add_url_rule('/notice', methods=['POST'], view_func=SetTradeRole.as_view('system_all_notice'))
 
