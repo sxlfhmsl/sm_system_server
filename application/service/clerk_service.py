@@ -60,3 +60,49 @@ class SmClerkService(BaseService):
             current_app.logger.error(e)
             return 1
 
+    @classmethod
+    def admin_update_clerk(cls, clerk_id, **para):
+        """
+        管理员更新业务员
+        :param clerk_id: 业务员id
+        :param para: 参数
+        :return: 返回结果            阐述
+                 0                   执行成功
+                 1                   参数错误
+                 2                   名称相同
+        """
+        try:
+            clerk = SmClerk.query.filter(SmClerk.NickName == para.get('NickName', None)).first()
+            if clerk and clerk.ID != clerk_id:
+                return 2
+            return cls.update_by_id(clerk_id, **para)
+        except Exception as e:
+            current_app.logger.error(e)
+            return 1
+
+    @classmethod
+    def agent_update_clerk(cls, agent_user, clerk_id, **para):
+        """
+        代理修改自身业务员
+        :param agent_user: 代理
+        :param clerk_id: 业务员id
+        :param para: 参数
+        :return: 返回结果            阐述
+                 0                   执行成功
+                 1                   参数错误
+                 2                   名称相同
+                 3                   权限不足
+        """
+        try:
+            para.pop('AgentID', None)
+            clerk = SmClerk.query.filter(SmClerk.ID == clerk_id).first()
+            if clerk.AgentID != agent_user.ID:
+                return 3
+            clerk = SmClerk.query.filter(SmClerk.NickName == para.get('NickName', None)).first()
+            if clerk and clerk.ID != clerk_id:
+                return 2
+            return cls.update_by_id(clerk_id, **para)
+        except Exception as e:
+            current_app.logger.error(e)
+            return 1
+

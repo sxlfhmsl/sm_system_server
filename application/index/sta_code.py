@@ -39,4 +39,5 @@ USER_AGENT_NOT_ENOUGH_MEMBER = {'code': 11006, 'msg': '代理可创建会员数�
 USER_WRONG_PASS = {'code': 11007, 'msg': '密码错误'}
 USER_DELETE_ERROR = {'code': 11008, 'msg': '禁止删除用户'}
 USER_AGENT_MEMBER_NOT_NULL = {'code': 11009, 'msg': '代理名下会员不为空或者代理不存在'}
+CLERK_SAME_NAME = {'code': 11010, 'msg': '业务员名称相同'}
 
