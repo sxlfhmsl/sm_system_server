@@ -124,7 +124,7 @@ class DeleteAdminByID(PermissionView):
     def response_admin(self):
         result = SmUserAdminService.delete_by_id(self.admin_id)
         if result == 0:
-            return jsonify(SUCCESS(result))
+            return jsonify(SUCCESS())
         elif result == 1:
             return jsonify(DELETE_NOT_EXITS)
         elif result == 2:
