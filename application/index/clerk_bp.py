@@ -128,9 +128,39 @@ class UpdateClerkByID(PermissionView):
             return jsonify(POST_PARA_ERROR)
 
 
+class QueryAllView(PermissionView):
+    """
+    查询所有业务员
+    """
+
+    para_legal_list_recv = ['Page', 'PageSize']
+    para_legal_list_return = ['Forbidden']
+
+    def response_admin(self):
+        try:
+            result = SmClerkService.query_all(**self.unpack_para(request.json))
+            self.pop_no_need(result['rows'])
+            return jsonify(SUCCESS(result))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+
+    def response_agent(self):
+        try:
+            result = SmClerkService.query_all(agent_id=self.u_id, **self.unpack_para(request.json))
+            self.pop_no_need(result['rows'])
+            return jsonify(SUCCESS(result))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+
+
 # 创建业务员
 clerk_bp.add_url_rule('/create', methods=['POST'], view_func=ClerkCreateView.as_view('clerk_create'))
 # 删除业务员-----通过id
 clerk_bp.add_url_rule('/delete/<clerk_id>', methods=['POST'], view_func=DeleteClerkByID.as_view('clerk_delete'))
 # 更新业务员-----通过id
 clerk_bp.add_url_rule('/update/<clerk_id>', methods=['POST'], view_func=UpdateClerkByID.as_view('clerk_update'))
+# 查询所有业务员
+clerk_bp.add_url_rule('/all', methods=['POST'], view_func=QueryAllView.as_view('clerk_query_all'))
+

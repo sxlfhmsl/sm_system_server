@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import current_app
 
 from .utils import BaseService
-from ..dao.models import db, SmClerk
+from ..dao.models import db, SmClerk, SmUserAgent
 
 
 class SmClerkService(BaseService):
@@ -105,4 +105,26 @@ class SmClerkService(BaseService):
         except Exception as e:
             current_app.logger.error(e)
             return 1
+
+    @classmethod
+    def query_all(cls, agent_id=None, Page=None, PageSize=None):
+        """
+        查询所有业务员，通过代理id
+        :param agent_id: 代理id
+        :return: 结果
+        """
+        if Page is None or PageSize is None:
+            Page = 1
+            PageSize = 1000
+        try:
+            filter_list = []
+            if agent_id:
+                filter_list.append(SmClerk.AgentID == agent_id)
+            # 返回分页结果  items当前页结果 total数量
+            page_result = db.session.query(SmClerk, SmUserAgent.LoginName.label('AgentName')).outerjoin(
+                SmUserAgent, SmUserAgent.ID == SmClerk.AgentID).filter(*filter_list).paginate(Page, PageSize)
+            return {"total": page_result.total, "rows": cls.result_to_dict(page_result.items)}
+        except Exception as e:
+            current_app.logger.error(e)
+            return None
 
