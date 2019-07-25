@@ -13,6 +13,7 @@ class SmClerkService(BaseService):
     """
     业务员相关逻辑代码
     """
+    BaseModel = SmClerk
 
     @classmethod
     def create_clerk(cls, user, user_type, **para):
@@ -36,6 +37,26 @@ class SmClerkService(BaseService):
             return 0
         except Exception as e:
             session.rollback()
+            current_app.logger.error(e)
+            return 1
+
+    @classmethod
+    def agent_delete_clerk(cls, agent_user, clerk_id):
+        """
+        代理删除业务员
+        :param agent_user: 代理用户
+        :param clerk_id: 目标id
+        :return: 返回结果            阐述
+                 0                   执行成功
+                 1                   参数错误
+                 2                   权限不足
+        """
+        try:
+            clerk = SmClerk.query.filter(SmClerk.ID == clerk_id).first()
+            if clerk.AgentID != agent_user.ID:
+                return 2
+            return cls.delete_by_id(clerk_id)
+        except Exception as e:
             current_app.logger.error(e)
             return 1
 
