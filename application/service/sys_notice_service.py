@@ -56,7 +56,7 @@ class SmSysNoticeService(BaseService):
             filter_list = []
             if user_type == 'agent':
                 filter_list.append(SmSysNotice.AgentDisable == 0)
-            else:
+            elif user_type == 'member':
                 filter_list.append(SmSysNotice.MemberDisable == 0)
             user_table = aliased(SmUser)
             page_result = db.session.query(SmSysNotice, user_table.LoginName.label('CreatorName')).\
