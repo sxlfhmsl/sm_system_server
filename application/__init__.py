@@ -81,6 +81,7 @@ def reg_blueprint(app):
     from .index.clerk_bp import clerk_bp
     from .index.system_bp import system_bp
     from .index.stock_bp import stock_bp
+    from .index.fund_bp import fund_bp
 
     # 用户相关蓝图接口
     app.register_blueprint(user_bp, url_prefix='/user')
@@ -94,6 +95,8 @@ def reg_blueprint(app):
     app.register_blueprint(clerk_bp, url_prefix='/clerk')
     # 股票相关接口
     app.register_blueprint(stock_bp, url_prefix='/stock')
+    # 资金相关接口
+    app.register_blueprint(fund_bp, url_prefix='/fund')
     # 系统相关接口
     app.register_blueprint(system_bp, url_prefix='/system')
     # 异常拦截
