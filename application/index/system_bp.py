@@ -72,10 +72,82 @@ class QueryAllNotice(PermissionView):
         return jsonify(SUCCESS(result['rows']))
 
 
+class CreateNotice(PermissionView):
+    """
+    获取所有可用公告
+    """
+    para_legal_list_recv = ['Title', 'Content', 'AgentDisable', 'MemberDisable']
+
+    def response_admin(self):
+        try:
+            if SmSysNoticeService.create_sys_notice(self.user, **self.unpack_para(request.json)) == 0:
+                return jsonify(SUCCESS())
+            else:
+                return jsonify(POST_PARA_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+
+
+class UpdateNoticeByID(PermissionView):
+    """
+    通过id更新公告
+    """
+    para_legal_list_recv = ['Title', 'Content', 'AgentDisable', 'MemberDisable']
+
+    def __init__(self):
+        super(UpdateNoticeByID, self).__init__()
+        self.notice_id = None    # 带查询的管理员id
+
+    def dispatch_request(self, token_dict: dict, notice_id):
+        self.notice_id = notice_id
+        return super(UpdateNoticeByID, self).dispatch_request(token_dict)
+
+    def response_admin(self):
+        try:
+            if SmSysNoticeService.update_by_id(self.notice_id, **self.unpack_para(request.json)) == 0:
+                return jsonify(SUCCESS())
+            else:
+                return jsonify(POST_PARA_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+
+
+class QueryNoticeByID(PermissionView):
+    """
+    通过id更新公告
+    """
+    para_legal_list_recv = ['Title', 'Content', 'AgentDisable', 'MemberDisable']
+
+    def __init__(self):
+        super(QueryNoticeByID, self).__init__()
+        self.notice_id = None    # 带查询的管理员id
+
+    def dispatch_request(self, token_dict: dict, notice_id):
+        self.notice_id = notice_id
+        return super(QueryNoticeByID, self).dispatch_request(token_dict)
+
+    def response_admin(self):
+        try:
+            if SmSysNoticeService.update_by_id(self.notice_id, **self.unpack_para(request.json)) == 0:
+                return jsonify(SUCCESS())
+            else:
+                return jsonify(POST_PARA_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+
+
 # 获取交易规则
 system_bp.add_url_rule('/traderole', methods=['POST'], view_func=QueryTradeRole.as_view('system_traderole'))
 # 设置交易规则
 system_bp.add_url_rule('/set_traderole', methods=['POST'], view_func=SetTradeRole.as_view('system_set_traderole'))
-# 设置交易规则
-system_bp.add_url_rule('/notice', methods=['POST'], view_func=SetTradeRole.as_view('system_all_notice'))
-
+# 获取公告
+system_bp.add_url_rule('/notice', methods=['POST'], view_func=QueryAllNotice.as_view('system_all_notice'))
+# 添加公告
+system_bp.add_url_rule('/notice/create', methods=['POST'], view_func=CreateNotice.as_view('system_create_notice'))
+# 更新公告
+system_bp.add_url_rule('/notice/update/<notice_id>', methods=['POST'], view_func=UpdateNoticeByID.as_view('system_update_notice'))
+# 通过id查询公告
+system_bp.add_url_rule('/notice/update/<notice_id>', methods=['POST'], view_func=UpdateNoticeByID.as_view('system_update_notice'))
