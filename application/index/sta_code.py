@@ -6,7 +6,7 @@
 
 # 请求成功
 def SUCCESS(data=None):
-    if data:
+    if data is not None:
         return {'code': 0, 'data': data, 'msg': '请求成功!'}
     else:
         return {'code': 0, 'msg': '请求成功!'}
