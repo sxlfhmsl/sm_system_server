@@ -65,6 +65,13 @@ class SmClosePlan(db.Model):
     sm_user_admin = db.relationship('SmUserAdmin', primaryjoin='SmClosePlan.CreatorID == SmUserAdmin.ID', backref='sm_close_plans')
 
 
+class SmDrawingStatu(db.Model):
+    __tablename__ = 'sm_drawing_status'
+
+    ID = db.Column(db.Integer, primary_key=True)
+    Description = db.Column(db.String(255), nullable=False)
+
+
 class SmManualTrade(db.Model):
     __tablename__ = 'sm_manual_trade'
 
@@ -92,10 +99,11 @@ class SmMemberDrawing(db.Model):
     BankOfDeposit = db.Column(db.String(50))
     BankAccountName = db.Column(db.String(20))
     BankAccount = db.Column(db.String(50), nullable=False)
-    DrawingStatus = db.Column(db.Integer, nullable=False)
+    DrawingStatus = db.Column(db.ForeignKey('sm_drawing_status.ID', onupdate='CASCADE'), nullable=False, index=True)
     ChangeTime = db.Column(db.DateTime)
     Note = db.Column(db.String(255))
 
+    sm_drawing_statu = db.relationship('SmDrawingStatu', primaryjoin='SmMemberDrawing.DrawingStatus == SmDrawingStatu.ID', backref='sm_member_drawings')
     sm_user_member = db.relationship('SmUserMember', primaryjoin='SmMemberDrawing.MemberID == SmUserMember.ID', backref='sm_member_drawings')
 
 
@@ -236,7 +244,7 @@ class SmUserAgent(SmUser):
     Bank = db.Column(db.String(255))
     BankAccount = db.Column(db.String(30))
     Cardholder = db.Column(db.String(30))
-    WithdrawPassWord = db.Column(db.String(30))
+    WithdrawPassWord = db.Column(db.String(64))
     Type = db.Column(db.ForeignKey('sm_user_type.ID'), nullable=False, index=True)
     AgentLevel = db.Column(db.Integer, nullable=False)
 

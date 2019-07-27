@@ -7,8 +7,9 @@ from flask.blueprints import Blueprint
 from flask import jsonify,current_app, request
 
 from .utils import PermissionView
-from .sta_code import SUCCESS, POST_PARA_ERROR
+from .sta_code import SUCCESS, POST_PARA_ERROR, OTHER_ERROR, NOT_ENOUGH_MONEY, WRONG_WITHDRAW_PASS
 from ..service.recharge_services import SmRechargeService
+from ..service.member_drawing_service import SmMemberDrawingService
 
 fund_bp = Blueprint('fund', __name__)
 
@@ -61,8 +62,41 @@ class RechargeRecordFund(PermissionView):
             return jsonify(SUCCESS([]))
 
 
+class WithdrawFund(PermissionView):
+    """
+    会员或者代理提款
+    """
+
+    def response_agent(self):
+        """
+        代理提款
+        :return:
+        """
+        pass
+
+    def response_member(self):
+        """
+        会员提款
+        :return:
+        """
+        try:
+            result = SmMemberDrawingService.withdraw(self.user, request.json.get('WithdrawPassWord', None), request.json.get('DrawingValue', None))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(WRONG_WITHDRAW_PASS)
+            elif result == 2:
+                return jsonify(NOT_ENOUGH_MONEY)
+            return jsonify(OTHER_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+
+
 # 充值创建
 fund_bp.add_url_rule('/recharge', methods=['POST'], view_func=RechargeFund.as_view('fund_recharge'))
 # 转账流水
 fund_bp.add_url_rule('/recharge_record', methods=['POST'], view_func=RechargeRecordFund.as_view('fund_recharge_record'))
+# 提款
+fund_bp.add_url_rule('/withdraw', methods=['POST'], view_func=WithdrawFund.as_view('fund_withdraw_record'))
 

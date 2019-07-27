@@ -41,3 +41,7 @@ USER_DELETE_ERROR = {'code': 11008, 'msg': '禁止删除用户'}
 USER_AGENT_MEMBER_NOT_NULL = {'code': 11009, 'msg': '代理名下会员不为空或者代理不存在'}
 CLERK_SAME_NAME = {'code': 11010, 'msg': '业务员名称相同'}
 
+#    提款相关错误
+NOT_ENOUGH_MONEY = {'code': 20001, 'msg': '可用金额不足'}
+WRONG_WITHDRAW_PASS = {'code': 20002, 'msg': '错误的提款密码'}
+
