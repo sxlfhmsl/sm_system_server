@@ -106,10 +106,43 @@ class WithdrawFund(PermissionView):
             return jsonify(POST_PARA_ERROR)
 
 
+class MemberWithdrawRecordFund(PermissionView):
+    """
+    查询提款流水__会员提款
+    """
+    para_legal_list_recv = ['LoginName', 'BankAccountName', 'Page', 'PageSize']
+
+    def response_admin(self):
+        try:
+            result = SmMemberDrawingService.query_withdraw_all(**self.unpack_para(request.json))
+            return jsonify(SUCCESS(result)) if result else jsonify(SUCCESS({'total': 0, 'rows': []}))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS({'total': 0, 'rows': []}))
+
+    def response_agent(self):
+        try:
+            result = SmMemberDrawingService.query_withdraw_all(AgentID=self.u_id, **self.unpack_para(request.json))
+            return jsonify(SUCCESS(result)) if result else jsonify(SUCCESS({'total': 0, 'rows': []}))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS({'total': 0, 'rows': []}))
+
+    def response_member(self):
+        try:
+            result = SmMemberDrawingService.query_withdraw_all(MemberID=self.u_id, **self.unpack_para(request.json))
+            return jsonify(SUCCESS(result['rows'])) if result else jsonify(SUCCESS([]))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS([]))
+
+
 # 充值创建
 fund_bp.add_url_rule('/recharge', methods=['POST'], view_func=RechargeFund.as_view('fund_recharge'))
 # 转账流水
 fund_bp.add_url_rule('/recharge_record', methods=['POST'], view_func=RechargeRecordFund.as_view('fund_recharge_record'))
 # 提款
-fund_bp.add_url_rule('/withdraw', methods=['POST'], view_func=WithdrawFund.as_view('fund_withdraw_record'))
+fund_bp.add_url_rule('/withdraw', methods=['POST'], view_func=WithdrawFund.as_view('fund_withdraw'))
+# 提款
+fund_bp.add_url_rule('/withdraw_record', methods=['POST'], view_func=MemberWithdrawRecordFund.as_view('fund_withdraw_record_member'))
 

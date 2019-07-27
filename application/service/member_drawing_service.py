@@ -4,8 +4,9 @@
 """
 from datetime import datetime
 from flask import current_app
+from sqlalchemy.orm import aliased
 
-from ..dao.models import db, SmMemberDrawing
+from ..dao.models import db, SmMemberDrawing, SmUserMember, SmDrawingStatu
 from .utils import BaseService
 
 
@@ -46,3 +47,39 @@ class SmMemberDrawingService(BaseService):
         except Exception as e:
             current_app.logger.error(e)
             return 3
+
+    @classmethod
+    def query_withdraw_all(cls, MemberID=None, AgentID=None, LoginName=None, BankAccountName=None, Page=None, PageSize=None):
+        """
+        查询所有的会员提款
+        :param MemberID: 会员id
+        :param AgentID: 代理id
+        :param LoginName: 登录名
+        :param BankAccountName: 账户名
+        :param Page: 分页起始
+        :param PageSize: 分页大小
+        :return: 执行结果list
+        """
+        if Page is None or PageSize is None:
+            Page = 1
+            PageSize = 1000
+        try:
+            filter_list = []
+            if AgentID is not None:
+                filter_list.append(SmUserMember.AgentID == AgentID)
+            if MemberID is not None:
+                filter_list.append(SmMemberDrawing.MemberID == MemberID)
+            if LoginName is not None:
+                filter_list.append(SmUserMember.LoginName.like('%' + LoginName + '%'))
+            if BankAccountName is not None:
+                filter_list.append(SmMemberDrawing.BankAccountName == BankAccountName)
+            page_result = db.session.query(
+                SmMemberDrawing, SmDrawingStatu.Description.label('DrawingStatusName'),
+                SmUserMember.LoginName.label('MemberNumber')).outerjoin(
+                SmUserMember, SmMemberDrawing.MemberID == SmUserMember.ID
+            ).outerjoin(SmDrawingStatu, SmDrawingStatu.ID == SmMemberDrawing.DrawingStatus).filter(*filter_list).\
+                order_by(SmMemberDrawing.DrawingTime.desc()).paginate(Page, PageSize)
+            return {"total": page_result.total, "rows": cls.result_to_dict(page_result.items)}
+        except Exception as e:
+            current_app.logger.error(e)
+            return None
