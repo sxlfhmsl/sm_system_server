@@ -10,6 +10,7 @@ from .utils import PermissionView
 from .sta_code import SUCCESS, POST_PARA_ERROR, OTHER_ERROR, NOT_ENOUGH_MONEY, WRONG_WITHDRAW_PASS
 from ..service.recharge_services import SmRechargeService
 from ..service.member_drawing_service import SmMemberDrawingService
+from ..service.agent_drawing_service import SmAgentDrawingService
 
 fund_bp = Blueprint('fund', __name__)
 
@@ -66,13 +67,25 @@ class WithdrawFund(PermissionView):
     """
     会员或者代理提款
     """
+    para_legal_list_recv = ['WithdrawPassWord', 'DrawingValue', 'Bank', 'BankOfDeposit', 'BankAccountName', 'BankAccount']
 
     def response_agent(self):
         """
         代理提款
         :return:
         """
-        pass
+        try:
+            result = SmAgentDrawingService.withdraw(self.user, **self.unpack_para(request.json))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(WRONG_WITHDRAW_PASS)
+            elif result == 2:
+                return jsonify(NOT_ENOUGH_MONEY)
+            return jsonify(OTHER_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
 
     def response_member(self):
         """
@@ -80,7 +93,7 @@ class WithdrawFund(PermissionView):
         :return:
         """
         try:
-            result = SmMemberDrawingService.withdraw(self.user, request.json.get('WithdrawPassWord', None), request.json.get('DrawingValue', None))
+            result = SmMemberDrawingService.withdraw(self.user, **self.unpack_para(request.json))
             if result == 0:
                 return jsonify(SUCCESS())
             elif result == 1:

@@ -4,8 +4,6 @@
 """
 from datetime import datetime
 from flask import current_app
-from sqlalchemy.orm import aliased
-from sqlalchemy import func
 
 from ..dao.models import db, SmMemberDrawing
 from .utils import BaseService
@@ -41,6 +39,7 @@ class SmMemberDrawingService(BaseService):
                                    DrawingTime=date_time_now, DrawingValue=DrawingValue, Bank=member_user.Bank,
                                    BankOfDeposit=member_user.OpeningBank, BankAccountName=member_user.Cardholder,
                                    BankAccount=member_user.BankAccount, DrawingStatus=1)
+            member_user.Margin -= DrawingValue
             session.add(draw)
             cls.create_log(member_user.ID, '资金', '会员提款', date_time_now, '会员' + member_user.LoginName + '发起提款' + str(DrawingValue))
             return 0

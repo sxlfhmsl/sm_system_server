@@ -17,11 +17,14 @@ class SmAgentDrawing(db.Model):
     DrawingValue = db.Column(db.Float(asdecimal=True), nullable=False)
     Bank = db.Column(db.String(50))
     BankOfDeposit = db.Column(db.String(50))
+    BankAccountName = db.Column(db.String(20))
     BankAccount = db.Column(db.String(50), nullable=False)
-    DrawingStatus = db.Column(db.Integer, nullable=False)
+    DrawingStatus = db.Column(db.ForeignKey('sm_drawing_status.ID', onupdate='CASCADE'), nullable=False, index=True)
     ChangeTime = db.Column(db.DateTime)
+    Note = db.Column(db.String(255))
 
     sm_user_agent = db.relationship('SmUserAgent', primaryjoin='SmAgentDrawing.AgentID == SmUserAgent.ID', backref='sm_agent_drawings')
+    sm_drawing_statu = db.relationship('SmDrawingStatu', primaryjoin='SmAgentDrawing.DrawingStatus == SmDrawingStatu.ID', backref='sm_agent_drawings')
 
 
 class SmBuyTrade(db.Model):
@@ -244,6 +247,7 @@ class SmUserAgent(SmUser):
     Bank = db.Column(db.String(255))
     BankAccount = db.Column(db.String(30))
     Cardholder = db.Column(db.String(30))
+    OpeningBank = db.Column(db.String(30))
     WithdrawPassWord = db.Column(db.String(64))
     Type = db.Column(db.ForeignKey('sm_user_type.ID'), nullable=False, index=True)
     AgentLevel = db.Column(db.Integer, nullable=False)
