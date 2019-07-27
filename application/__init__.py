@@ -108,7 +108,7 @@ def init_redis_value():
     初始化redis中的值
     :return:
     """
-    path = os.getcwd() + '\\application\\static\\'
+    path = os.getcwd() + '/application/static/'
     # 设置交易规则标题
     file = open(path + 'trade_role_title', encoding='utf8')
     RedisOp().set_normal('system_trade_role_title', file.read())
