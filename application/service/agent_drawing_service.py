@@ -5,7 +5,7 @@
 from datetime import datetime
 from flask import current_app
 
-from ..dao.models import db, SmAgentDrawing
+from ..dao.models import db, SmAgentDrawing, SmUserAgent, SmDrawingStatu
 from .utils import BaseService
 
 
@@ -46,3 +46,37 @@ class SmAgentDrawingService(BaseService):
         except Exception as e:
             current_app.logger.error(e)
             return 3
+
+    @classmethod
+    def query_withdraw_all(cls, AgentID=None, LoginName=None, BankAccountName=None, Page=None, PageSize=None):
+        """
+        查询所有的会员提款
+        :param MemberID: 会员id
+        :param AgentID: 代理id
+        :param LoginName: 登录名
+        :param BankAccountName: 账户名
+        :param Page: 分页起始
+        :param PageSize: 分页大小
+        :return: 执行结果list
+        """
+        if Page is None or PageSize is None:
+            Page = 1
+            PageSize = 1000
+        try:
+            filter_list = []
+            if AgentID is not None:
+                filter_list.append(SmAgentDrawing.AgentID == AgentID)
+            if LoginName is not None:
+                filter_list.append(SmUserAgent.LoginName.like('%' + LoginName + '%'))
+            if BankAccountName is not None:
+                filter_list.append(SmAgentDrawing.BankAccountName.like('%' + BankAccountName + '%'))
+            page_result = db.session.query(
+                SmAgentDrawing, SmDrawingStatu.Description.label('DrawingStatusName'),
+                SmUserAgent.LoginName.label('AgentNumber')).outerjoin(
+                SmUserAgent, SmAgentDrawing.AgentID == SmUserAgent.ID
+            ).outerjoin(SmDrawingStatu, SmDrawingStatu.ID == SmAgentDrawing.DrawingStatus).filter(*filter_list). \
+                order_by(SmAgentDrawing.DrawingTime.desc()).paginate(Page, PageSize)
+            return {"total": page_result.total, "rows": cls.result_to_dict(page_result.items)}
+        except Exception as e:
+            current_app.logger.error(e)
+            return None

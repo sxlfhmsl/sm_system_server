@@ -72,7 +72,7 @@ class SmMemberDrawingService(BaseService):
             if LoginName is not None:
                 filter_list.append(SmUserMember.LoginName.like('%' + LoginName + '%'))
             if BankAccountName is not None:
-                filter_list.append(SmMemberDrawing.BankAccountName == BankAccountName)
+                filter_list.append(SmMemberDrawing.BankAccountName.like('%' + BankAccountName + '%'))
             page_result = db.session.query(
                 SmMemberDrawing, SmDrawingStatu.Description.label('DrawingStatusName'),
                 SmUserMember.LoginName.label('MemberNumber')).outerjoin(
