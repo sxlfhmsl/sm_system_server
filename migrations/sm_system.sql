@@ -361,7 +361,7 @@ CREATE TABLE `sm_user_agent` (
   `Bank` varchar(255) DEFAULT NULL COMMENT '收款银行',
   `BankAccount` varchar(30) DEFAULT NULL COMMENT '银行账号',
   `Cardholder` varchar(30) DEFAULT NULL COMMENT '银行账户名',
-  `WithdrawPassWord` varchar(30) DEFAULT NULL COMMENT '取款密码',
+  `WithdrawPassWord` varchar(64) DEFAULT NULL COMMENT '取款密码',
   `Type` int(11) NOT NULL COMMENT '账户类型，正式，测试，其他',
   `AgentLevel` int(11) unsigned NOT NULL COMMENT '代理用户等级（甄别多级代理）',
   PRIMARY KEY (`ID`),
