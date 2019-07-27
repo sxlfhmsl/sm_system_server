@@ -21,3 +21,6 @@ flask-sqlacodegen mysql+pymysql://root:admin123@127.0.0.1:3306/sm_system  --outf
 
 6.分页教程
 https://wxnacy.com/2018/03/27/sqlalchemy-paginate/
+
+开启远程调试
+ ../sm_venv/bin/python -m flask run --host 0.0.0.0 --port 26581

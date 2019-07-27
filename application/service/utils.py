@@ -20,6 +20,15 @@ class BaseService:
     BaseModel = None
 
     @staticmethod
+    def create_order_id(time: datetime):
+        """
+        生成订单号
+        :param time: 时间
+        :return:
+        """
+        return time.strftime('%Y%m%d%H%M%S%f')
+
+    @staticmethod
     def create_log(user_id: str, user_type: str, model: str, time: datetime, note: str):
         """
         创建日志到数据库
