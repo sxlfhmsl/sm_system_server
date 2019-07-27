@@ -15,9 +15,9 @@ fund_bp = Blueprint('fund', __name__)
 
 class RechargeFund(PermissionView):
     """
-    充值
+    银证转账，充值，https://baike.baidu.com/item/%E9%93%B6%E8%AF%81%E8%BD%AC%E8%B4%A6/8643750?fr=aladdin
     """
-    para_legal_list_recv = ['Value', 'VendorNumber']
+    para_legal_list_recv = ['Value', 'VendorNumber', 'Bank']
 
     def response_member(self):
         try:
