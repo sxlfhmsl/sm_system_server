@@ -164,8 +164,8 @@ class SmStockPara(db.Model):
     Sellable = db.Column(db.Integer, server_default=db.FetchedValue())
     Close = db.Column(db.Integer)
     Suspend = db.Column(db.Integer)
-    SuspendTime = db.Column(db.DateTime)
     Forbidden = db.Column(db.Integer)
+    SuspendTime = db.Column(db.DateTime)
     Note = db.Column(db.String(255))
 
 
