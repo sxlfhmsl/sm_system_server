@@ -9,7 +9,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from .utils import BaseService
-from ..dao.models import db, SmStockPara, SmBuyTrade, SmTradeBill
+from ..dao.models import db, SmStockPara, SmBuyTrade, SmTradeBill, SmUserMember, SmUserAgent, SmClerk
 from ..utils.request_data import DataApi51Request
 
 
@@ -61,3 +61,36 @@ class StockTradeService(BaseService):
             current_app.logger.error(e)
             return 4
 
+    @classmethod
+    def query_buy_record(cls, AgentID=None, ClerkID=None, MemberID=None, Page=None, PageSize=None):
+        """
+        查询所有股票买入记录
+        :param AgentID: 代理id
+        :param ClerkID: 业务员id
+        :param MemberID: 会员id
+        :param Page: 页数
+        :param PageSize: 每页数量
+        :return: 结果
+        """
+        print('fuck__________________')
+        if Page is None or PageSize is None:
+            Page = 1
+            PageSize = 1000
+        session = db.session
+        try:
+            filter_list = []
+            if AgentID is not None:
+                filter_list.append(SmUserMember.AgentID == AgentID)
+            if ClerkID is not None:
+                filter_list.append(SmUserMember.ClerkID == ClerkID)
+            if MemberID is not None:
+                filter_list.append(SmBuyTrade.MemberID == MemberID)
+            page_result = session.query(SmBuyTrade, SmUserAgent.LoginName.label('AgentName'), SmClerk.NickName.label('ClerkName'), SmUserMember.LoginName.label('MemberName')).\
+                outerjoin(SmUserMember, SmUserMember.ID == SmBuyTrade.MemberID).\
+                outerjoin(SmUserAgent, SmUserMember.AgentID == SmUserAgent.ID).\
+                outerjoin(SmClerk, SmUserMember.ClerkID == SmClerk.ID).order_by(SmBuyTrade.Number.desc()).\
+                filter(*filter_list).paginate(Page, PageSize)
+            return {"total": page_result.total, "rows": cls.result_to_dict(page_result.items)}
+        except Exception as e:
+            current_app.logger.error(e)
+            return None

@@ -37,6 +37,40 @@ class StockBuyView(PermissionView):
             return jsonify(POST_PARA_ERROR)
 
 
-# 充值创建
+class StockBuyRecordView(PermissionView):
+    """
+    查询用户持仓记录
+    """
+    para_legal_list_recv = ['AgentID', 'ClerkID', 'MemberID', 'Page', 'PageSize']
+
+    def response_admin(self):
+        try:
+            result = StockTradeService.query_buy_record(**self.unpack_para(request.json))
+            return jsonify(SUCCESS(result)) if result else jsonify(SUCCESS({'total': 0, 'rows': []}))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS({'total': 0, 'rows': []}))
+
+    def response_agent(self):
+        try:
+            result = StockTradeService.query_buy_record(AgentID=self.u_id, **self.unpack_para(request.json))
+            return jsonify(SUCCESS(result)) if result else jsonify(SUCCESS({'total': 0, 'rows': []}))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS({'total': 0, 'rows': []}))
+
+    def response_member(self):
+        try:
+            result = StockTradeService.query_buy_record(AgentID=self.user.AgentID, ClerkID=self.user.ClerkID,
+                                                        MemberID=self.u_id, **self.unpack_para(request.json))
+            return jsonify(SUCCESS(result['rows'])) if result else jsonify(SUCCESS([]))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS([]))
+
+
+# 买入股票
 stock_bp.add_url_rule('/buy', methods=['POST'], view_func=StockBuyView.as_view('buy_stock'))
+# 查询买入
+stock_bp.add_url_rule('/buy_record', methods=['POST'], view_func=StockBuyRecordView.as_view('buy_record_stock'))
 
