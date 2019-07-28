@@ -5,11 +5,13 @@
 
 from flask import current_app
 from sqlalchemy.orm import aliased
+from sqlalchemy import or_
 from datetime import datetime
 from decimal import Decimal
 
 from .utils import BaseService
-from ..dao.models import db, SmStockPara, SmBuyTrade, SmTradeBill, SmUserMember, SmUserAgent, SmClerk, SmTradeType, SmSellTrade
+from ..dao.models import db, SmStockPara, SmBuyTrade, SmTradeBill, SmUserMember, SmUserAgent, SmClerk, SmTradeType
+from ..dao.models import SmSellTrade, SmUser
 from ..utils.request_data import DataApi51Request
 
 
@@ -159,4 +161,105 @@ class StockTradeService(BaseService):
             session.rollback()
             current_app.logger.error(e)
             return 2
+
+    @classmethod
+    def query_sell_record(cls, AgentID=None, MemberID=None, MemberName=None, StartTime=None, EndTime=None, Page=None, PageSize=None):
+        """
+        查询所有平仓记录
+        :param AgentID: 代理id
+        :param MemberID: 会员id
+        :param MemberName: 会员名称
+        :param StartTime: 开始时间
+        :param EndTime: 结束时间
+        :param Page: 分页位置
+        :param PageSize: 每页数量
+        :return: 执行结果
+        """
+        if Page is None or PageSize is None:
+            Page = 1
+            PageSize = 1000
+        session = db.session
+        try:
+            filter_list = []
+            if AgentID is not None:
+                filter_list.append(SmUserMember.AgentID == AgentID)
+            if MemberID is not None:
+                filter_list.append(SmSellTrade.MemberID == MemberID)
+            if MemberName is not None:
+                filter_list.append(SmUserMember.LoginName.like('%' + MemberName + '%'))
+            if StartTime is not None:
+                filter_list.append(SmSellTrade.SellTime >= StartTime)
+            if EndTime is not None:
+                filter_list.append(SmSellTrade.SellTime <= EndTime)
+            page_result = session.query(SmSellTrade, SmUserAgent.LoginName.label('AgentName'),
+                                        SmUserMember.LoginName.label('MemberName'), SmStockPara.Name.label('TickerName'),
+                                        SmTradeType.Description.label('BuyTypeDes')). \
+                outerjoin(SmTradeType, SmTradeType.ID == SmSellTrade.BuyType). \
+                outerjoin(SmStockPara, SmStockPara.TickerSymbol == SmSellTrade.TickerSymbol). \
+                outerjoin(SmUserMember, SmUserMember.ID == SmSellTrade.MemberID). \
+                outerjoin(SmUserAgent, SmUserMember.AgentID == SmUserAgent.ID). \
+                order_by(SmSellTrade.SellNumber.desc()). \
+                filter(*filter_list).paginate(Page, PageSize)
+            return {"total": page_result.total, "rows": cls.result_to_dict(page_result.items)}
+        except Exception as e:
+            current_app.logger.error(e)
+            return None
+
+    @classmethod
+    def query_record_trade_bill(cls, TradeType=None, Number=None, MemberName=None, TickerSymbol=None, TickerName=None,
+                                Hands=None, StartTime=None, EndTime=None, Page=None, PageSize=None, agent_user=None,
+                                MemberID=None):
+        """
+        查询所有记录_____暂时按照交易账单处理，资金明细也一致
+        :param TradeType: 交易类型
+        :param Number: 单号
+        :param MemberName: 会员名称
+        :param TickerSymbol: 股票代码
+        :param TickerName: 股票名称
+        :param Hands: 手数
+        :param StartTime: 起始时间
+        :param EndTime: 结束时间
+        :param Page: 页数
+        :param PageSize: 每页数量
+        :param agent_user: 代理
+        :param MemberID: 会员id
+        :return:
+        """
+        if Page is None or PageSize is None:
+            Page = 1
+            PageSize = 1000
+        session = db.session
+        try:
+            filter_list = []
+            if TradeType is not None:
+                filter_list.append(SmTradeBill.TradeType == TradeType)
+            if Number is not None:
+                filter_list.append(or_(SmTradeBill.Number.like('%' + Number + '%')))
+            if MemberName is not None:
+                filter_list.append(SmUserMember.LoginName.like('%' + MemberName + '%'))
+            if TickerSymbol is not None:
+                filter_list.append(SmTradeBill.TickerSymbol.like('%' + TickerSymbol + '%'))
+            if TickerName is not None:
+                filter_list.append(SmTradeBill.TickerName.like('%' + TickerName + '%'))
+            if Hands is not None:
+                filter_list.append(SmTradeBill.Hands == Hands)
+            if StartTime is not None:
+                filter_list.append(SmTradeBill.SellTime >= StartTime)
+            if EndTime is not None:
+                filter_list.append(SmTradeBill.SellTime <= EndTime)
+            if agent_user is not None:
+                filter_list.append(SmUserMember.AgentID == agent_user.ID)
+            if MemberID is not None:
+                filter_list.append(SmTradeBill.MemberID == MemberID)
+            user_t = aliased(SmUser)
+            page_result = session.query(SmTradeBill, SmUserMember.LoginName.label('MemberName'),
+                                        user_t.LoginName.label('OperatorName')). \
+                outerjoin(SmUserMember, SmTradeBill.MemberID == SmUserMember.ID). \
+                outerjoin(user_t, SmTradeBill.OpID == user_t.ID). \
+                order_by(SmTradeBill.Number.desc()). \
+                filter(*filter_list).paginate(Page, PageSize)
+            return {"total": page_result.total, "rows": cls.result_to_dict(page_result.items)}
+        except Exception as e:
+            current_app.logger.error(e)
+            return None
 

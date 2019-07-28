@@ -113,11 +113,81 @@ class StockSellView(PermissionView):
             return jsonify(POST_PARA_ERROR)
 
 
+class StockSellRecordView(PermissionView):
+    """
+    查询用户平仓记录
+    """
+    para_legal_list_recv = ['AgentID', 'MemberName', 'StartTime', 'EndTime', 'Page', 'PageSize']
+
+    def response_admin(self):
+        try:
+            result = StockTradeService.query_sell_record(**self.unpack_para(request.json))
+            return jsonify(SUCCESS(result)) if result else jsonify(SUCCESS({'total': 0, 'rows': []}))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS({'total': 0, 'rows': []}))
+
+    def response_agent(self):
+        try:
+            result = StockTradeService.query_sell_record(AgnetID=self.u_id, **self.unpack_para(request.json))
+            return jsonify(SUCCESS(result)) if result else jsonify(SUCCESS({'total': 0, 'rows': []}))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS({'total': 0, 'rows': []}))
+
+    def response_member(self):
+        try:
+            result = StockTradeService.query_sell_record(AgentID=None, MemberName=None, MemberID=self.u_id, **self.unpack_para(request.json))
+            return jsonify(SUCCESS(result['rows'])) if result else jsonify(SUCCESS([]))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS([]))
+
+
+class StockRecordView(PermissionView):
+    """
+    查询所有交易记录
+    """
+    para_legal_list_recv = ['TradeType', 'Number', 'MemberName', 'TickerSymbol', 'TickerName', 'Hands', 'StartTime',
+                            'EndTime', 'Page', 'PageSize']
+
+    def response_admin(self):
+        try:
+            result = StockTradeService.query_record_trade_bill(**self.unpack_para(request.json))
+            return jsonify(SUCCESS(result)) if result else jsonify(SUCCESS({'total': 0, 'rows': []}))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS({'total': 0, 'rows': []}))
+
+    def response_agent(self):
+        try:
+            result = StockTradeService.query_record_trade_bill(agent_user=self.user, **self.unpack_para(request.json))
+            return jsonify(SUCCESS(result)) if result else jsonify(SUCCESS({'total': 0, 'rows': []}))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS({'total': 0, 'rows': []}))
+
+    def response_member(self):
+        try:
+            result = StockTradeService.\
+                query_record_trade_bill(TradeType=None, Number=None, MemberName=None, TickerSymbol=None, TickerName=None,
+                                        Hands=None, Page=None, PageSize=None, agent_user=None, MemberID=self.u_id,
+                                        **self.unpack_para(request.json))
+            return jsonify(SUCCESS(result['rows'])) if result else jsonify(SUCCESS([]))
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(SUCCESS([]))
+
+
 # 买入股票
 stock_bp.add_url_rule('/buy', methods=['POST'], view_func=StockBuyView.as_view('buy_stock'))
 # 查询买入
 stock_bp.add_url_rule('/buy_record', methods=['POST'], view_func=StockBuyRecordView.as_view('buy_record_stock'))
 # 买入股票
 stock_bp.add_url_rule('/sell', methods=['POST'], view_func=StockSellView.as_view('sell_stock'))
+# 查询平仓
+stock_bp.add_url_rule('/sell_record', methods=['POST'], view_func=StockSellRecordView.as_view('sell_record_stock'))
+# 查询交易记录
+stock_bp.add_url_rule('/record', methods=['POST'], view_func=StockRecordView.as_view('record_stock'))
 
 
