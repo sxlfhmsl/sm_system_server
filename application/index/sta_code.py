@@ -45,3 +45,9 @@ CLERK_SAME_NAME = {'code': 11010, 'msg': '业务员名称相同'}
 NOT_ENOUGH_MONEY = {'code': 20001, 'msg': '可用金额不足'}
 WRONG_WITHDRAW_PASS = {'code': 20002, 'msg': '错误的提款密码'}
 
+
+#    股票交易相关
+STOCK_CANNOT_BUY = {'code': 30001, 'msg': '购买被系统禁止（停牌等），无法购买股票'}
+STOCK_BUY_NOT_ENOUGH_HANDS = {'code': 30002, 'msg': '购买不到最小手数'}
+STOCK_BUY_NOT_ENOUGH_MONEY = {'code': 30003, 'msg': '资金不足'}
+

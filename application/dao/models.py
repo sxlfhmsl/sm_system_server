@@ -30,18 +30,18 @@ class SmAgentDrawing(db.Model):
 class SmBuyTrade(db.Model):
     __tablename__ = 'sm_buy_trade'
 
-    ID = db.Column(db.String(64), primary_key=True)
-    Number = db.Column(db.String(30), nullable=False)
+    Number = db.Column(db.String(30), primary_key=True)
     MemberID = db.Column(db.ForeignKey('sm_user_member.ID'), nullable=False, index=True)
     TradeTime = db.Column(db.DateTime, nullable=False)
     TickerSymbol = db.Column(db.String(30), nullable=False)
     Price = db.Column(db.Float(asdecimal=True), nullable=False)
     Hands = db.Column(db.Integer, nullable=False)
-    BuyType = db.Column(db.Integer, nullable=False)
+    BuyType = db.Column(db.ForeignKey('sm_trade_type.ID', onupdate='CASCADE'), nullable=False, index=True)
     BuyFeeRate = db.Column(db.Float(asdecimal=True))
     StoreFeeRate = db.Column(db.Float(asdecimal=True))
     RiseFallSpreadRate = db.Column(db.Float(asdecimal=True))
 
+    sm_trade_type = db.relationship('SmTradeType', primaryjoin='SmBuyTrade.BuyType == SmTradeType.ID', backref='sm_buy_trades')
     sm_user_member = db.relationship('SmUserMember', primaryjoin='SmBuyTrade.MemberID == SmUserMember.ID', backref='sm_buy_trades')
 
 
@@ -132,22 +132,22 @@ class SmRecharge(db.Model):
 class SmSellTrade(db.Model):
     __tablename__ = 'sm_sell_trade'
 
-    ID = db.Column(db.String(64), primary_key=True)
+    SellNumber = db.Column(db.String(30), primary_key=True)
     MemberID = db.Column(db.ForeignKey('sm_user_member.ID', ondelete='SET NULL', onupdate='CASCADE'), index=True)
     TickerSymbol = db.Column(db.String(30), nullable=False)
     BuyNumber = db.Column(db.String(30), nullable=False)
     BuyTime = db.Column(db.DateTime, nullable=False)
     BuyPrice = db.Column(db.Float(asdecimal=True), nullable=False)
-    SellNumber = db.Column(db.String(30), nullable=False)
     SellTime = db.Column(db.DateTime, nullable=False)
     SellPrice = db.Column(db.Float(asdecimal=True), nullable=False)
-    BuyType = db.Column(db.Integer, nullable=False)
+    BuyType = db.Column(db.ForeignKey('sm_trade_type.ID', onupdate='CASCADE'), nullable=False, index=True)
     Fee = db.Column(db.Float(asdecimal=True), nullable=False)
     Interest = db.Column(db.Float(asdecimal=True), nullable=False)
     StampDuty = db.Column(db.Float(asdecimal=True), nullable=False)
     Profit = db.Column(db.Float(asdecimal=True), nullable=False)
     Hands = db.Column(db.Integer, nullable=False)
 
+    sm_trade_type = db.relationship('SmTradeType', primaryjoin='SmSellTrade.BuyType == SmTradeType.ID', backref='sm_sell_trades')
     sm_user_member = db.relationship('SmUserMember', primaryjoin='SmSellTrade.MemberID == SmUserMember.ID', backref='sm_sell_trades')
 
 
@@ -194,9 +194,8 @@ class SmSysNotice(db.Model):
 class SmTradeBill(db.Model):
     __tablename__ = 'sm_trade_bill'
 
-    ID = db.Column(db.String(64), primary_key=True)
-    Number = db.Column(db.String(30), nullable=False)
-    TradeType = db.Column(db.Integer, nullable=False)
+    Number = db.Column(db.String(30), primary_key=True)
+    TradeType = db.Column(db.String(30), nullable=False, index=True)
     MemberID = db.Column(db.ForeignKey('sm_user_member.ID'), index=True)
     TickerSymbol = db.Column(db.String(30), nullable=False)
     TickerName = db.Column(db.String(30), nullable=False)
@@ -204,10 +203,18 @@ class SmTradeBill(db.Model):
     Hands = db.Column(db.Integer, nullable=False)
     Amount = db.Column(db.Float(asdecimal=True), nullable=False)
     Time = db.Column(db.DateTime, nullable=False)
-    OpID = db.Column(db.Integer)
+    OpID = db.Column(db.String(64))
     Note = db.Column(db.String(255))
 
     sm_user_member = db.relationship('SmUserMember', primaryjoin='SmTradeBill.MemberID == SmUserMember.ID', backref='sm_trade_bills')
+
+
+class SmTradeType(db.Model):
+    __tablename__ = 'sm_trade_type'
+
+    ID = db.Column(db.Integer, primary_key=True)
+    Description = db.Column(db.String(255))
+    Coefficient = db.Column(db.Integer)
 
 
 class SmUser(db.Model):
