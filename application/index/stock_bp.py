@@ -9,7 +9,7 @@ from flask import current_app, jsonify, request
 from .utils import PermissionView
 from ..service.stock_trade_service import StockTradeService
 from .sta_code import SUCCESS, POST_PARA_ERROR, STOCK_CANNOT_BUY, STOCK_BUY_NOT_ENOUGH_HANDS, STOCK_BUY_NOT_ENOUGH_MONEY
-from .sta_code import OTHER_ERROR
+from .sta_code import OTHER_ERROR, PERMISSION_DENIED_ERROR
 
 stock_bp = Blueprint('stock', __name__)
 
@@ -69,8 +69,55 @@ class StockBuyRecordView(PermissionView):
             return jsonify(SUCCESS([]))
 
 
+class StockSellView(PermissionView):
+    """
+    股票平仓，原来代码涉及存储过程
+    """
+    # 购买单号    买价平仓（管理员）
+    para_legal_list_recv = ['Number', 'BuyPrSell']
+
+    def response_admin(self):
+        try:
+            result = StockTradeService.sell_stock(user=self.user, **self.unpack_para(request.json))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(PERMISSION_DENIED_ERROR)
+            return jsonify(OTHER_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+
+    def response_agent(self):
+        try:
+            result = StockTradeService.sell_stock(user=self.user, BuyPrSell=False, agent_user=self.user, **self.unpack_para(request.json))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(PERMISSION_DENIED_ERROR)
+            return jsonify(OTHER_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+
+    def response_member(self):
+        try:
+            result = StockTradeService.sell_stock(user=self.user, BuyPrSell=False, **self.unpack_para(request.json))
+            if result == 0:
+                return jsonify(SUCCESS())
+            elif result == 1:
+                return jsonify(PERMISSION_DENIED_ERROR)
+            return jsonify(OTHER_ERROR)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(POST_PARA_ERROR)
+
+
 # 买入股票
 stock_bp.add_url_rule('/buy', methods=['POST'], view_func=StockBuyView.as_view('buy_stock'))
 # 查询买入
 stock_bp.add_url_rule('/buy_record', methods=['POST'], view_func=StockBuyRecordView.as_view('buy_record_stock'))
+# 买入股票
+stock_bp.add_url_rule('/sell', methods=['POST'], view_func=StockSellView.as_view('sell_stock'))
+
 
