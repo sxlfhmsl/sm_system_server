@@ -110,6 +110,23 @@ class SmMemberDrawing(db.Model):
     sm_user_member = db.relationship('SmUserMember', primaryjoin='SmMemberDrawing.MemberID == SmUserMember.ID', backref='sm_member_drawings')
 
 
+class SmMemberFundsLog(db.Model):
+    __tablename__ = 'sm_member_funds_log'
+
+    ID = db.Column(db.String(64), primary_key=True)
+    BillNumber = db.Column(db.String(64), nullable=False)
+    MemberID = db.Column(db.ForeignKey('sm_user_member.ID'), index=True)
+    BillType = db.Column(db.String(64), nullable=False)
+    Amount = db.Column(db.Float(asdecimal=True), nullable=False)
+    DealNumber = db.Column(db.String(64), nullable=False)
+    CreatorType = db.Column(db.String(64), nullable=False)
+    CreatorID = db.Column(db.String(64), nullable=False)
+    CreateTime = db.Column(db.DateTime, nullable=False)
+    Note = db.Column(db.String(255))
+
+    sm_user_member = db.relationship('SmUserMember', primaryjoin='SmMemberFundsLog.MemberID == SmUserMember.ID', backref='sm_member_funds_logs')
+
+
 class SmRecharge(db.Model):
     __tablename__ = 'sm_recharge'
 
