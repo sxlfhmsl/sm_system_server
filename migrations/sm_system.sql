@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50712
 File Encoding         : 65001
 
-Date: 2019-07-29 01:26:43
+Date: 2019-07-30 00:28:40
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -186,6 +186,30 @@ CREATE TABLE `sm_member_drawing` (
 
 -- ----------------------------
 -- Records of sm_member_drawing
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for sm_member_funds_log
+-- ----------------------------
+DROP TABLE IF EXISTS `sm_member_funds_log`;
+CREATE TABLE `sm_member_funds_log` (
+  `ID` varchar(64) NOT NULL COMMENT '资金明细id',
+  `BillNumber` varchar(64) NOT NULL COMMENT '单号',
+  `MemberID` varchar(64) DEFAULT NULL COMMENT '会员id',
+  `BillType` varchar(64) NOT NULL COMMENT '交易类型(平仓，买入等)',
+  `Amount` double NOT NULL COMMENT '发生金额（进账：正，出账：负）',
+  `DealNumber` varchar(64) NOT NULL COMMENT '交易单号',
+  `CreatorType` varchar(64) NOT NULL COMMENT '创建人类型',
+  `CreatorID` varchar(64) NOT NULL COMMENT '创建者',
+  `CreateTime` datetime NOT NULL COMMENT '创建时间',
+  `Note` varchar(255) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`ID`),
+  KEY `MemberID` (`MemberID`),
+  CONSTRAINT `sm_member_funds_log_ibfk_1` FOREIGN KEY (`MemberID`) REFERENCES `sm_user_member` (`ID`) ON DELETE NO ACTION ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='会员资金明细';
+
+-- ----------------------------
+-- Records of sm_member_funds_log
 -- ----------------------------
 
 -- ----------------------------
@@ -3976,6 +4000,40 @@ CREATE TABLE `sm_sys_conf` (
 -- ----------------------------
 -- Records of sm_sys_conf
 -- ----------------------------
+INSERT INTO `sm_sys_conf` VALUES ('agent_name_length', '3-10', '代理账号长度限制');
+INSERT INTO `sm_sys_conf` VALUES ('available_limit_for_single_share', '1', '单股可用额度');
+INSERT INTO `sm_sys_conf` VALUES ('days_of_suspension_to_sell', '1', '停牌几天后强制平仓');
+INSERT INTO `sm_sys_conf` VALUES ('draw_time_am', '09:35-11:30', '上午提款时间段');
+INSERT INTO `sm_sys_conf` VALUES ('draw_time_pm', '13:06-14:58', '下午提款时间段');
+INSERT INTO `sm_sys_conf` VALUES ('interest_fee_rate', '0.0024', '融资利息率');
+INSERT INTO `sm_sys_conf` VALUES ('login_max_num_of_attempts', '6', '最大尝试登录次数');
+INSERT INTO `sm_sys_conf` VALUES ('login_name_limit', '[0-9A-Za-Z]+', '登录名限制规则，正则表达式');
+INSERT INTO `sm_sys_conf` VALUES ('margin_min', '100', '最低保证金，系统留仓时使用');
+INSERT INTO `sm_sys_conf` VALUES ('margin_warning_value', '0', '保证金预警值');
+INSERT INTO `sm_sys_conf` VALUES ('maximum_number_of_positions_per_share', '999999981', '单股升跌最大持仓数');
+INSERT INTO `sm_sys_conf` VALUES ('max_buy_hands', '1000000', '最大买入手数');
+INSERT INTO `sm_sys_conf` VALUES ('max_lose_auto_sell', '0.1', '最大亏损率，超过就自动平仓');
+INSERT INTO `sm_sys_conf` VALUES ('max_online_time', '86400', '最长在线时长（秒）');
+INSERT INTO `sm_sys_conf` VALUES ('max_profit_auto_sell', '0.1', '最大利润率，超过后自动平仓');
+INSERT INTO `sm_sys_conf` VALUES ('max_remain_day', '7', '最打留仓天数');
+INSERT INTO `sm_sys_conf` VALUES ('member_name_length', '3-100', '会员账号长度限制');
+INSERT INTO `sm_sys_conf` VALUES ('minimum_minutes_between_buying_and_selling', '15', '买入后多少分钟后可以卖出');
+INSERT INTO `sm_sys_conf` VALUES ('minimum_recharge', '100', '最低充值额度');
+INSERT INTO `sm_sys_conf` VALUES ('minimum_turnover', '1000', '最低成交额设置');
+INSERT INTO `sm_sys_conf` VALUES ('min_buy_hands', '10', '最小买入手数');
+INSERT INTO `sm_sys_conf` VALUES ('nick_name_length', '3-20', '昵称长度限制');
+INSERT INTO `sm_sys_conf` VALUES ('open_time_am', '09:35-11:30', '上午开市时间段');
+INSERT INTO `sm_sys_conf` VALUES ('open_time_pm', '13:05-14:58', '下午开市时间段');
+INSERT INTO `sm_sys_conf` VALUES ('overtime_fee_rate', '0', '超时加收手续费');
+INSERT INTO `sm_sys_conf` VALUES ('password_length', '3-15', '密码长度限制');
+INSERT INTO `sm_sys_conf` VALUES ('price_slip_ratio_on_falling', '0', '下跌时价格滑动比率');
+INSERT INTO `sm_sys_conf` VALUES ('price_slip_ratio_on_rise', '0', '上涨时价格滑动比率');
+INSERT INTO `sm_sys_conf` VALUES ('px_change_rate_double_buy_limit', '0.1', '双日涨跌幅买入限制，涨跌幅超过不许买入');
+INSERT INTO `sm_sys_conf` VALUES ('px_change_rate_single_buy_limit', '0.06', '单日涨跌幅买入限制，涨跌幅超过不许买入');
+INSERT INTO `sm_sys_conf` VALUES ('remain_fee_rate', '0.0006', '留仓费率');
+INSERT INTO `sm_sys_conf` VALUES ('sell_time_am', '09:35-11:30', '上午平仓时间段');
+INSERT INTO `sm_sys_conf` VALUES ('sell_time_pm', '13:05-14:58', '下午平仓时间段');
+INSERT INTO `sm_sys_conf` VALUES ('stamp_duty_fee_rate', '0.0010', '印花税率');
 
 -- ----------------------------
 -- Table structure for sm_sys_notice
